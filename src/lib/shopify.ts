@@ -262,3 +262,4 @@ function normalizeCart(checkout: any): ShopifyCart {
   };
 }
 
+
