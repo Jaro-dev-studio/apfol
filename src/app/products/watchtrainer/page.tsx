@@ -17,9 +17,14 @@ import {
   Package,
   Minus,
   Plus,
+  Loader2,
 } from "lucide-react";
+import { useCart } from "@/context/cart-context";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Shopify variant ID for WatchTrainer - replace with actual ID from your Shopify store
+const WATCHTRAINER_VARIANT_ID = process.env.NEXT_PUBLIC_WATCHTRAINER_VARIANT_ID || "demo-variant-watchtrainer";
 
 const features = [
   {
@@ -80,12 +85,33 @@ const reviews = [
 
 export default function WatchTrainerPage() {
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const productShowcaseRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
   const specsRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  const { addToCart } = useCart();
+
+  const handleAddToCart = async () => {
+    setIsAddingToCart(true);
+    try {
+      await addToCart(WATCHTRAINER_VARIANT_ID, quantity);
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    setIsAddingToCart(true);
+    try {
+      await addToCart(WATCHTRAINER_VARIANT_ID, quantity);
+      // Cart drawer will open automatically, or redirect to checkout
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -318,14 +344,22 @@ export default function WatchTrainerPage() {
                   <Button
                     size="lg"
                     className="flex-1 bg-white text-black hover:bg-white/90 rounded-full px-8 text-base font-medium"
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart}
                   >
-                    <ShoppingBag className="mr-2 h-5 w-5" />
+                    {isAddingToCart ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <ShoppingBag className="mr-2 h-5 w-5" />
+                    )}
                     Add to Cart
                   </Button>
                   <Button
                     size="lg"
                     variant="outline"
                     className="flex-1 border-white/30 text-white hover:bg-white/10 rounded-full px-8"
+                    onClick={handleBuyNow}
+                    disabled={isAddingToCart}
                   >
                     Buy Now
                   </Button>
@@ -643,8 +677,14 @@ export default function WatchTrainerPage() {
             <Button
               size="lg"
               className="bg-white text-black hover:bg-white/90 rounded-full px-10 text-base font-medium"
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
             >
-              <ShoppingBag className="mr-2 h-5 w-5" />
+              {isAddingToCart ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                <ShoppingBag className="mr-2 h-5 w-5" />
+              )}
               Add to Cart - $49.99
             </Button>
           </div>

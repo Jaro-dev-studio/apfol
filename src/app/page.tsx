@@ -207,75 +207,135 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Product Section */}
+      {/* Products Section */}
       <section
         ref={featuredRef}
         id="products"
         className="relative py-32 px-6"
       >
         <div className="max-w-[1200px] mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className="featured-content">
-              <Badge className="bg-red-500/10 text-red-400 border-red-500/20 mb-6">
-                Featured
-              </Badge>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6">
-                WatchTrainer
-              </h2>
-              <p className="text-lg text-white/60 mb-8 leading-relaxed">
-                The ultimate fusion of nostalgia and technology. Our Pokeball-inspired 
-                Apple Watch charger brings a touch of adventure to your daily charging routine.
-              </p>
-              <ul className="space-y-4 mb-8">
-                {[
-                  "MagSafe compatible charging",
-                  "Premium aluminum construction",
-                  "LED charging indicator",
-                  "Universal Apple Watch support",
-                ].map((feature, index) => (
-                  <li key={index} className="flex items-center gap-3 text-white/80">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex items-center gap-6">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-white text-black hover:bg-white/90 rounded-full px-8"
-                >
-                  <Link href="/products/watchtrainer">
-                    View Product
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <span className="text-2xl font-semibold">$49.99</span>
-              </div>
-            </div>
-            
-            <div className="featured-image relative">
-              <div className="relative aspect-square max-w-lg mx-auto">
-                {/* Pokeball image placeholder */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-gray-900 to-black border border-white/10 flex items-center justify-center overflow-hidden">
-                  <div className="relative w-3/4 h-3/4 rounded-full">
-                    {/* Top half */}
-                    <div className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full bg-gradient-to-br from-red-400 to-red-600">
-                      <div className="absolute top-6 left-6 w-1/4 h-1/4 bg-white/30 rounded-full blur-lg" />
-                    </div>
-                    {/* Bottom half */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-full bg-gradient-to-br from-gray-100 to-white" />
-                    {/* Center band */}
-                    <div className="absolute top-1/2 left-0 right-0 h-6 -translate-y-1/2 bg-gray-900" />
-                    {/* Center button */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white border-4 border-gray-900">
-                      <div className="absolute inset-2 rounded-full bg-gradient-to-br from-gray-100 to-gray-200" />
-                    </div>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4">
+              Our Products
+            </h2>
+            <p className="text-lg text-white/60 max-w-2xl mx-auto">
+              Discover our collection of premium Apple Watch accessories, 
+              each designed to bring joy to your daily routine.
+            </p>
+          </div>
+
+          {/* Product Grid */}
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* WatchTrainer Card */}
+            <div className="featured-content group relative rounded-3xl bg-gradient-to-br from-gray-900 to-black border border-white/10 overflow-hidden hover:border-white/20 transition-all duration-300">
+              {/* Product Image */}
+              <div className="relative aspect-square p-8 flex items-center justify-center">
+                <div className="relative w-3/4 h-3/4 rounded-full group-hover:scale-105 transition-transform duration-500">
+                  {/* Top half */}
+                  <div className="absolute top-0 left-0 right-0 h-1/2 rounded-t-full bg-gradient-to-br from-red-400 to-red-600">
+                    <div className="absolute top-6 left-6 w-1/4 h-1/4 bg-white/30 rounded-full blur-lg" />
+                  </div>
+                  {/* Bottom half */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-full bg-gradient-to-br from-gray-100 to-white" />
+                  {/* Center band */}
+                  <div className="absolute top-1/2 left-0 right-0 h-6 -translate-y-1/2 bg-gray-900" />
+                  {/* Center button */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-white border-4 border-gray-900">
+                    <div className="absolute inset-2 rounded-full bg-gradient-to-br from-gray-100 to-gray-200" />
                   </div>
                 </div>
-                {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-red-500/20 rounded-full blur-2xl" />
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+                {/* Glow */}
+                <div className="absolute inset-0 bg-red-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </div>
+              {/* Product Info */}
+              <div className="p-8 pt-0">
+                <Badge className="bg-red-500/10 text-red-400 border-red-500/20 mb-4">
+                  Best Seller
+                </Badge>
+                <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-3">
+                  WatchTrainer
+                </h3>
+                <p className="text-white/60 mb-6">
+                  Pokeball-inspired Apple Watch charger with MagSafe compatibility and premium aluminum build.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-semibold">$49.99</span>
+                  <Button
+                    asChild
+                    className="bg-white text-black hover:bg-white/90 rounded-full px-6"
+                  >
+                    <Link href="/products/watchtrainer">
+                      View Product
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Watchintosh Card */}
+            <div className="featured-content group relative rounded-3xl bg-gradient-to-br from-[#e8e0d0] to-[#d4cdc0] border border-[#c5beb0] overflow-hidden hover:border-[#b5ae a0] transition-all duration-300">
+              {/* Product Image */}
+              <div className="relative aspect-square p-8 flex items-center justify-center">
+                <div className="relative w-2/3 h-3/4 group-hover:scale-105 transition-transform duration-500">
+                  {/* Mac Body */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#f0e8d8] to-[#e0d8c8] rounded-2xl border border-[#d0c8b8] shadow-xl">
+                    {/* Top vents */}
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-0.5">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className="w-3 h-0.5 bg-[#b8b0a0] rounded-full" />
+                      ))}
+                    </div>
+                    {/* Screen bezel */}
+                    <div className="absolute top-6 left-3 right-3 h-[55%] bg-[#c8c0b0] rounded-lg p-1.5">
+                      <div className="w-full h-full bg-[#1a1a1a] rounded overflow-hidden relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1a0a] to-[#001100] flex items-center justify-center">
+                          <div className="text-[#33ff33] text-center">
+                            <div className="text-lg font-mono font-bold">15:24</div>
+                            <div className="text-[8px] font-mono opacity-70">SUN 28</div>
+                          </div>
+                        </div>
+                        {/* Scan lines */}
+                        <div 
+                          className="absolute inset-0 opacity-10 pointer-events-none"
+                          style={{ backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.4) 1px, rgba(0,0,0,0.4) 2px)" }}
+                        />
+                      </div>
+                    </div>
+                    {/* Logo */}
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#a8a090] text-[8px] font-medium tracking-wider">
+                      Watchintosh
+                    </div>
+                    {/* Drive slot */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-10 h-1 bg-[#b8b0a0] rounded-full" />
+                  </div>
+                </div>
+                {/* Glow */}
+                <div className="absolute inset-0 bg-[#33ff33]/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </div>
+              {/* Product Info */}
+              <div className="p-8 pt-0">
+                <Badge className="bg-amber-600/10 text-amber-700 border-amber-600/20 mb-4">
+                  Retro Revival
+                </Badge>
+                <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-3 text-[#1d1d1f]">
+                  Watchintosh
+                </h3>
+                <p className="text-[#1d1d1f]/60 mb-6">
+                  Macintosh-inspired Apple Watch stand. 3D printed with precision for that authentic vintage feel.
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-semibold text-[#1d1d1f]">$29.99</span>
+                  <Button
+                    asChild
+                    className="bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full px-6"
+                  >
+                    <Link href="/products/watchintosh">
+                      View Product
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
