@@ -418,7 +418,7 @@ export default function WatchintoshProductPage() {
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
                 className="text-xl md:text-2xl text-[#1d1d1f]/60 mb-6"
               >
-                The Dream Apple Watch Stand
+                The Dream Apple Watch Charging Dock
               </motion.p>
 
               {/* Compelling Description */}
@@ -434,7 +434,7 @@ export default function WatchintoshProductPage() {
                   one nudge away from crashing onto the floor.
                 </p>
                 <p className="text-[#1d1d1f]/70 leading-relaxed">
-                  The Watchintosh will not only keep your Apple Watch safe, but it&apos;s a <b>replica of the first Mac ever made</b>, the Macintosh 128k, precision-crafted to make your Apple Watch look like the tiny computer it really is.
+                  The Watchintosh is a <b>replica of the first Mac ever made</b>, the Macintosh 128k, precision-crafted to charge your Apple Watch while making it look like the tiny computer it really is.
                 </p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#1d1d1f]/60 pt-1">
                   <span className="flex items-center gap-1.5">
@@ -649,92 +649,6 @@ export default function WatchintoshProductPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="relative py-32 px-6">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-4 text-[#1d1d1f]">
-              Simple Setup
-            </h2>
-            <p className="text-lg text-[#1d1d1f]/60 max-w-2xl mx-auto">
-              Get your Watchintosh up and running in seconds.
-            </p>
-          </div>
-
-          <div className="space-y-24">
-            {[
-              {
-                step: "01",
-                title: "Insert Your Charger",
-                description:
-                  "Slide your existing Apple Watch magnetic charging cable through the back opening. The Watchintosh is designed to work with your official Apple charger.",
-                align: "left",
-              },
-              {
-                step: "02",
-                title: "Position the Cable",
-                description:
-                  "Route the cable through the integrated channel. The charger puck sits perfectly centered in the screen cutout.",
-                align: "right",
-              },
-              {
-                step: "03",
-                title: "Dock Your Watch",
-                description:
-                  "Slot your Apple Watch into the screen opening and feel the satisfying click as the magnetic charger securely attaches. Nightstand mode activates automatically.",
-                align: "left",
-              },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: item.align === "right" ? 100 : -100 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                className={`flex flex-col ${
-                  item.align === "right" ? "md:flex-row-reverse" : "md:flex-row"
-                } items-center gap-12`}
-              >
-                <div className="flex-1">
-                  <div className="max-w-md mx-auto md:mx-0">
-                    <span className="text-6xl md:text-8xl font-bold text-[#1d1d1f]/10">
-                      {item.step}
-                    </span>
-                    <h3 className="text-2xl md:text-3xl font-semibold mb-4 -mt-4 text-[#1d1d1f]">
-                      {item.title}
-                    </h3>
-                    <p className="text-lg text-[#1d1d1f]/60 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="relative w-48 h-48 md:w-56 md:h-56 mx-auto">
-                    {/* Step illustration */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#f0e8d8] to-[#e0d8c8] border border-[#d0c8b8] flex items-center justify-center shadow-lg">
-                      <div className="w-20 h-24 md:w-24 md:h-28 relative">
-                        {/* Mini mac */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#e8e0d0] to-[#d4cdc0] rounded-lg border border-[#c5beb0]">
-                          <div className="absolute top-2 left-2 right-2 h-1/2 bg-[#1a1a1a] rounded-sm">
-                            <div className="absolute inset-0.5 bg-[#0a1a0a] rounded-sm flex items-center justify-center">
-                              <div className="w-2 h-2 bg-[#33ff33] rounded-full opacity-70 animate-pulse" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Step number */}
-                    <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold shadow-lg">
-                      {index + 1}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Specifications */}
       <section className="relative py-32 px-6 bg-gradient-to-b from-[#f5f0e8] to-[#eee8dc]">
         <div className="max-w-[800px] mx-auto">
@@ -768,12 +682,8 @@ export default function WatchintoshProductPage() {
                   Whats in the Box
                 </h4>
                 <ul className="text-[#1d1d1f]/60 space-y-1">
-                  <li>1x Watchintosh Stand</li>
+                  <li>1x Watchintosh Charging Dock with built-in Apple Watch Magnetic Charger, USB-C port.</li>
                 </ul>
-                <p className="text-sm text-[#1d1d1f]/40 mt-3 italic">
-                  Note: Apple Watch charger not included. Uses your existing
-                  Apple charging cable.
-                </p>
               </div>
             </div>
           </div>
