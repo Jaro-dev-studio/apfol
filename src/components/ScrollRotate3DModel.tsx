@@ -325,6 +325,7 @@ export default function ScrollRotate3DModel({
 
     const handleTouchStart = (e: TouchEvent) => {
       if (!enableInteraction || e.touches.length !== 1) return;
+      e.preventDefault();
       isDragging.current = true;
       userHasInteracted.current = true; // Stop auto-rotation
       previousMousePosition.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -332,6 +333,7 @@ export default function ScrollRotate3DModel({
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging.current || !enableInteraction || e.touches.length !== 1) return;
+      e.preventDefault();
 
       const deltaX = e.touches[0].clientX - previousMousePosition.current.x;
       const deltaY = e.touches[0].clientY - previousMousePosition.current.y;
@@ -357,8 +359,8 @@ export default function ScrollRotate3DModel({
       container.addEventListener("mousedown", handleMouseDown);
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
-      container.addEventListener("touchstart", handleTouchStart, { passive: true });
-      window.addEventListener("touchmove", handleTouchMove, { passive: true });
+      container.addEventListener("touchstart", handleTouchStart, { passive: false });
+      window.addEventListener("touchmove", handleTouchMove, { passive: false });
       window.addEventListener("touchend", handleTouchEnd);
     }
 
