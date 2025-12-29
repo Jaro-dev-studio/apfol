@@ -948,6 +948,9 @@ export default function WatchintoshProductPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
 
+  // Check if current slide is the 3D model
+  const is3DSlideActive = productImages[activeImageIndex]?.type === "3d";
+
   // Update active index based on scroll position
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -1062,13 +1065,14 @@ export default function WatchintoshProductPage() {
                   {/* Carousel Container */}
                   <div
                     ref={carouselRef}
-                    className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide rounded-2xl bg-white/50 border border-[#d4cdc0]/50"
+                    className={`flex snap-x snap-mandatory scrollbar-hide rounded-2xl bg-white/50 border border-[#d4cdc0]/50 ${is3DSlideActive ? "overflow-hidden" : "overflow-x-auto"}`}
                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                   >
                     {productImages.map((item, index) => (
                       <div
                         key={index}
                         className="flex-shrink-0 w-full aspect-square snap-center"
+                        style={item.type === "3d" ? { touchAction: "none" } : undefined}
                       >
                         {item.type === "image" ? (
                           <div className="relative w-full h-full">
@@ -1083,9 +1087,7 @@ export default function WatchintoshProductPage() {
                         ) : (
                           <div 
                             className="relative w-full h-full"
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onTouchStart={(e) => e.stopPropagation()}
-                            onTouchMove={(e) => e.stopPropagation()}
+                            style={{ touchAction: "none" }}
                           >
                             {/* Title for 3D Demo */}
                             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">

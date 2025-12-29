@@ -98,6 +98,8 @@ export default function ScrollRotate3DModel({
     renderer.toneMappingExposure = 1.2;
     // Transparent background
     renderer.setClearColor(0x000000, 0);
+    // Ensure touch events work properly on canvas
+    renderer.domElement.style.touchAction = "none";
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -354,14 +356,18 @@ export default function ScrollRotate3DModel({
     // Add event listeners
     window.addEventListener("resize", handleResize);
     
+    const canvas = renderer.domElement;
+    
     if (enableInteraction) {
       container.style.cursor = "grab";
+      canvas.style.cursor = "grab";
       container.addEventListener("mousedown", handleMouseDown);
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
-      container.addEventListener("touchstart", handleTouchStart, { passive: false });
-      window.addEventListener("touchmove", handleTouchMove, { passive: false });
-      window.addEventListener("touchend", handleTouchEnd);
+      // Attach touch events to canvas for direct touch handling
+      canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+      canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+      canvas.addEventListener("touchend", handleTouchEnd);
     }
 
     // Cleanup
@@ -372,9 +378,9 @@ export default function ScrollRotate3DModel({
         container.removeEventListener("mousedown", handleMouseDown);
         window.removeEventListener("mousemove", handleMouseMove);
         window.removeEventListener("mouseup", handleMouseUp);
-        container.removeEventListener("touchstart", handleTouchStart);
-        window.removeEventListener("touchmove", handleTouchMove);
-        window.removeEventListener("touchend", handleTouchEnd);
+        canvas.removeEventListener("touchstart", handleTouchStart);
+        canvas.removeEventListener("touchmove", handleTouchMove);
+        canvas.removeEventListener("touchend", handleTouchEnd);
       }
 
       if (animationIdRef.current) {
