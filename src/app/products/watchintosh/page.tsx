@@ -457,7 +457,7 @@ export default function WatchintoshProductPage() {
                   one nudge away from crashing onto the floor.
                 </p>
                 <p className="text-[#1d1d1f]/70 leading-relaxed">
-                  The Watchintosh will not only keep your Apple Watch safe, but it's a <b>replica of the first Mac ever made</b>, the Macintosh 128k, precision-crafted to make your Apple Watch look like the tiny computer it really is.
+                  The Watchintosh will not only keep your Apple Watch safe, but it&apos;s a <b>replica of the first Mac ever made</b>, the Macintosh 128k, precision-crafted to make your Apple Watch look like the tiny computer it really is.
                 </p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#1d1d1f]/60 pt-1">
                   <span className="flex items-center gap-1.5">
@@ -475,13 +475,38 @@ export default function WatchintoshProductPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                className="flex items-baseline gap-4 mb-8"
+                className="flex items-baseline gap-4 mb-4 sm:mb-8"
               >
                 <span className="text-4xl font-semibold text-[#1d1d1f]">
                   ${currentPrice.toFixed(2)}
                 </span>
                 <span className="text-sm text-[#1d1d1f]/40 line-through">${strikethroughPrice.toFixed(2)}</span>
                 <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Save {savingsPercent}%</span>
+              </motion.div>
+
+              {/* Mobile Buy 2 Get 1 Free Offer - shown only on mobile */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.35 }}
+                className="mb-6 sm:hidden"
+              >
+                <div className="flex items-center gap-2 px-3 py-2 rounded-full border transition-all bg-green-50 border-green-200 w-fit">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-700">
+                    {quantity >= 3 ? 'Buy 2 Get 1 Free Applied!' : 'Buy 2 Get 1 Free'}
+                  </span>
+                  {quantity < 3 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-xs text-green-700 border-green-300 hover:text-green-800 hover:bg-green-100 hover:border-green-400 font-medium ml-1"
+                      onClick={() => setQuantity(3)}
+                    >
+                      Get Offer
+                    </Button>
+                  )}
+                </div>
               </motion.div>
 
               {/* Desktop product actions - hidden on mobile */}
@@ -768,7 +793,7 @@ export default function WatchintoshProductPage() {
                 step: "03",
                 title: "Dock Your Watch",
                 description:
-                  "Place your Apple Watch on the charger. It magnetically snaps into place and activates Nightstand mode automatically.",
+                  "Slot your Apple Watch into the screen opening and feel the satisfying click as the magnetic charger securely attaches. Nightstand mode activates automatically.",
                 align: "left",
               },
             ].map((item, index) => (
@@ -1000,75 +1025,55 @@ export default function WatchintoshProductPage() {
         transition={{ delay: 0.5, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="fixed bottom-0 left-0 right-0 z-40 bg-[#f5f0e8]/95 backdrop-blur-lg border-t border-[#d4cdc0] p-4 pb-8 sm:hidden"
       >
-        <div className="space-y-3">
-          {/* Buy 2 Get 1 Free Offer */}
-          <div className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border transition-all bg-green-50 border-green-200">
-            <Check className="h-4 w-4 text-green-600" />
-            <span className="text-sm font-medium text-green-700">
-              {quantity >= 3 ? 'Buy 2 Get 1 Free Applied!' : 'Buy 2 Get 1 Free'}
-            </span>
-            {quantity < 3 && (
+        <div className="flex items-center gap-3">
+          {/* Quantity selector */}
+          <div className="flex items-center gap-1 bg-[#1d1d1f]/5 rounded-full p-1">
+            <motion.div whileTap={{ scale: 0.9 }}>
               <Button
-                size="sm"
-                variant="outline"
-                className="h-6 text-xs text-green-700 border-green-300 hover:text-green-800 hover:bg-green-100 hover:border-green-400 font-medium ml-1"
-                onClick={() => setQuantity(3)}
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full hover:bg-[#1d1d1f]/10 text-[#1d1d1f]"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
               >
-                Get Offer
+                <Minus className="h-4 w-4" />
               </Button>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-3">
-            {/* Quantity selector */}
-            <div className="flex items-center gap-1 bg-[#1d1d1f]/5 rounded-full p-1">
-              <motion.div whileTap={{ scale: 0.9 }}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-full hover:bg-[#1d1d1f]/10 text-[#1d1d1f]"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-              </motion.div>
-              <motion.span
-                key={quantity}
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1 }}
-                className="w-8 text-center font-medium"
-              >
-                {quantity}
-              </motion.span>
-              <motion.div whileTap={{ scale: 0.9 }}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-full hover:bg-[#1d1d1f]/10 text-[#1d1d1f]"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            </div>
-
-            {/* Add to cart button */}
-            <motion.div whileTap={{ scale: 0.98 }} className="flex-1">
+            </motion.div>
+            <motion.span
+              key={quantity}
+              initial={{ scale: 1.2 }}
+              animate={{ scale: 1 }}
+              className="w-8 text-center font-medium"
+            >
+              {quantity}
+            </motion.span>
+            <motion.div whileTap={{ scale: 0.9 }}>
               <Button
-                size="lg"
-                className="w-full h-12 bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full text-base font-medium"
-                onClick={handleAddToCart}
-                disabled={isAddingToCart}
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full hover:bg-[#1d1d1f]/10 text-[#1d1d1f]"
+                onClick={() => setQuantity(quantity + 1)}
               >
-                {isAddingToCart ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                ) : (
-                  <ShoppingBag className="mr-2 h-5 w-5" />
-                )}
-                Add - ${currentPrice.toFixed(2)}
+                <Plus className="h-4 w-4" />
               </Button>
             </motion.div>
           </div>
+
+          {/* Add to cart button */}
+          <motion.div whileTap={{ scale: 0.98 }} className="flex-1">
+            <Button
+              size="lg"
+              className="w-full h-12 bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full text-base font-medium"
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
+            >
+              {isAddingToCart ? (
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              ) : (
+                <ShoppingBag className="mr-2 h-5 w-5" />
+              )}
+              Add - ${currentPrice.toFixed(2)}
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
     </div>
