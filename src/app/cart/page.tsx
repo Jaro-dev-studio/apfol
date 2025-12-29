@@ -64,7 +64,7 @@ export default function CartPage() {
               size="lg"
               className="border-[#1d1d1f]/20 text-[#1d1d1f] hover:bg-[#1d1d1f]/5 rounded-full"
             >
-              <Link href="/">
+              <Link href="/products/watchintosh">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Continue Shopping
               </Link>
@@ -119,7 +119,7 @@ export default function CartPage() {
                   size="lg"
                   className="bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full px-8"
                 >
-                  <Link href="/">
+                  <Link href="/products/watchintosh">
                     Browse Products
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -148,19 +148,13 @@ export default function CartPage() {
                       className="flex gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-white/70 border border-[#d4cdc0] shadow-sm"
                     >
                       {/* Product Image */}
-                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl bg-[#1d1d1f]/5 overflow-hidden shrink-0">
-                        {item.variant.image ? (
-                          <Image
-                            src={item.variant.image.src}
-                            alt={item.variant.image.altText || item.title}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <ShoppingBag className="h-8 sm:h-10 w-8 sm:w-10 text-[#1d1d1f]/30" />
-                          </div>
-                        )}
+                      <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-xl bg-[#f5f0e8] overflow-hidden shrink-0">
+                        <Image
+                          src={item.variant.image?.src || "/watchintosh.png"}
+                          alt={item.variant.image?.altText || item.title}
+                          fill
+                          className="object-contain p-1"
+                        />
                       </div>
 
                       {/* Product Info */}
@@ -269,6 +263,18 @@ export default function CartPage() {
                         {parseFloat(cart?.subtotalPrice.amount || "0").toFixed(2)}
                       </span>
                     </div>
+                    {parseFloat(cart?.discountAmount?.amount || "0") > 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="flex justify-between"
+                      >
+                        <span className="text-green-600 font-medium">Buy 2 Get 1 Free</span>
+                        <span className="text-green-600 font-medium">
+                          -${parseFloat(cart?.discountAmount?.amount || "0").toFixed(2)}
+                        </span>
+                      </motion.div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-[#1d1d1f]/60">Shipping</span>
                       <span className="text-[#1d1d1f]/60">
@@ -316,6 +322,36 @@ export default function CartPage() {
                   <p className="text-center text-sm text-[#1d1d1f]/40 mt-4">
                     Secure checkout powered by Shopify
                   </p>
+
+                  {/* Buy 2 Get 1 Free Promo Banner */}
+                  {itemCount > 0 && itemCount < 3 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200"
+                    >
+                      <p className="text-sm font-medium text-green-800">
+                        Add {3 - itemCount} more item{3 - itemCount !== 1 ? "s" : ""} to get 1 FREE!
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Buy 2 Get 1 Free on all products
+                      </p>
+                    </motion.div>
+                  )}
+                  {itemCount >= 3 && parseFloat(cart?.discountAmount?.amount || "0") > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200"
+                    >
+                      <p className="text-sm font-medium text-green-800">
+                        You are saving ${parseFloat(cart?.discountAmount?.amount || "0").toFixed(2)}!
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Buy 2 Get 1 Free applied
+                      </p>
+                    </motion.div>
+                  )}
 
                   {/* Trust badges */}
                   <div className="mt-6 pt-6 border-t border-[#d4cdc0] space-y-3 text-sm text-[#1d1d1f]/60">

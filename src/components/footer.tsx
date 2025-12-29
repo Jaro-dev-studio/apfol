@@ -24,7 +24,7 @@ export function Footer() {
             </Link>
           </div>
           <p className="text-xs text-center md:text-right">
-            Copyright 2024 Apfol Inc. All rights reserved.
+            Copyright {new Date().getFullYear()} Apfol Inc. All rights reserved.
           </p>
         </div>
       </div>

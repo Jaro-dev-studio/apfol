@@ -74,6 +74,11 @@ export interface ShopifyCart {
     currencyCode: string;
   };
   lineItemCount: number;
+  // Local discount calculation (Buy 2 Get 1 Free)
+  discountAmount?: {
+    amount: string;
+    currencyCode: string;
+  };
 }
 
 // Helper functions

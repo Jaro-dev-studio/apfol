@@ -2,9 +2,19 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+
+const Diamond3D = dynamic(() => import("@/components/Diamond3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-amber-200 to-amber-400 animate-pulse" />
+    </div>
+  ),
+});
 
 const timeline = [
   {
@@ -154,7 +164,7 @@ export default function AboutPage() {
 
       {/* Values Section */}
       <section className="relative py-32 px-6 bg-gradient-to-b from-[#f5f0e8] to-[#eee8dc] overflow-hidden">
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -289,75 +299,8 @@ export default function AboutPage() {
                 </p>
               </motion.div>
               <div className="relative h-[400px] flex items-center justify-center order-1 lg:order-2">
-                {/* Diamond shape */}
-                <motion.div
-                  className="relative"
-                  animate={{ rotateY: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  <div className="relative">
-                    {/* Diamond SVG */}
-                    <motion.svg
-                      viewBox="0 0 100 100"
-                      className="w-40 h-40"
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <defs>
-                        <linearGradient id="diamondGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#fbbf24" />
-                          <stop offset="50%" stopColor="#f59e0b" />
-                          <stop offset="100%" stopColor="#d97706" />
-                        </linearGradient>
-                        <filter id="glow">
-                          <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                          <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                          </feMerge>
-                        </filter>
-                      </defs>
-                      <polygon
-                        points="50,5 95,40 50,95 5,40"
-                        fill="url(#diamondGradient)"
-                        filter="url(#glow)"
-                        className="drop-shadow-2xl"
-                      />
-                      <polygon
-                        points="50,5 50,95 5,40"
-                        fill="rgba(255,255,255,0.2)"
-                      />
-                      <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                      <line x1="5" y1="40" x2="95" y2="40" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                    </motion.svg>
-                  </div>
-                </motion.div>
-                {/* Sparkle effects */}
-                {[...Array(12)].map((_, i) => (
-                  <motion.div
-                    key={`sparkle-${i}`}
-                    className="absolute"
-                    style={{
-                      left: `${15 + (i % 4) * 25}%`,
-                      top: `${15 + Math.floor(i / 4) * 30}%`,
-                    }}
-                    animate={{
-                      opacity: [0, 1, 0],
-                      scale: [0.5, 1, 0.5],
-                    }}
-                    transition={{
-                      duration: 2,
-                      delay: i * 0.2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 text-amber-400 fill-current">
-                      <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                    </svg>
-                  </motion.div>
-                ))}
+                {/* 3D Diamond */}
+                <Diamond3D className="absolute inset-0" />
               </div>
             </div>
           </motion.div>
@@ -372,84 +315,132 @@ export default function AboutPage() {
           >
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative h-[400px] flex items-center justify-center">
-                {/* Target rings */}
-                {[...Array(4)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute rounded-full border-2"
+                {/* Background grid pattern - represents details to examine */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="w-64 h-64 opacity-20"
                     style={{
-                      width: `${80 + i * 60}px`,
-                      height: `${80 + i * 60}px`,
-                      borderColor: `rgba(79, 70, 229, ${0.4 - i * 0.08})`,
+                      backgroundImage: `
+                        linear-gradient(rgba(79, 70, 229, 0.5) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(79, 70, 229, 0.5) 1px, transparent 1px)
+                      `,
+                      backgroundSize: '20px 20px',
+                    }}
+                  />
+                </div>
+
+                {/* Small details scattered around */}
+                {[
+                  { left: "30%", top: "25%", size: 6 },
+                  { left: "65%", top: "30%", size: 4 },
+                  { left: "25%", top: "60%", size: 5 },
+                  { left: "70%", top: "65%", size: 3 },
+                  { left: "45%", top: "75%", size: 4 },
+                  { left: "55%", top: "20%", size: 5 },
+                ].map((dot, i) => (
+                  <motion.div
+                    key={`dot-${i}`}
+                    className="absolute rounded-full bg-indigo-300"
+                    style={{
+                      left: dot.left,
+                      top: dot.top,
+                      width: dot.size,
+                      height: dot.size,
                     }}
                     animate={{
-                      scale: [1, 1.05, 1],
+                      opacity: [0.3, 0.6, 0.3],
                     }}
                     transition={{
                       duration: 2,
-                      delay: i * 0.15,
+                      delay: i * 0.3,
                       repeat: Infinity,
-                      ease: "easeInOut",
                     }}
                   />
                 ))}
-                {/* Center dot */}
+
+                {/* Magnifying Glass */}
                 <motion.div
-                  className="absolute w-4 h-4 rounded-full bg-indigo-500"
+                  className="relative z-10"
                   animate={{
-                    scale: [1, 1.5, 1],
-                    boxShadow: [
-                      "0 0 0 0 rgba(79, 70, 229, 0.4)",
-                      "0 0 0 20px rgba(79, 70, 229, 0)",
-                      "0 0 0 0 rgba(79, 70, 229, 0.4)",
-                    ],
+                    x: [-30, 30],
                   }}
                   transition={{
-                    duration: 2,
+                    duration: 3,
                     repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-                {/* Magnifying glass */}
-                <motion.div
-                  className="absolute"
-                  animate={{
-                    x: [0, 30, 0, -30, 0],
-                    y: [0, -20, 0, 20, 0],
-                  }}
-                  transition={{
-                    duration: 8,
-                    repeat: Infinity,
+                    repeatType: "reverse",
                     ease: "easeInOut",
                   }}
                 >
-                  <div className="relative">
-                    <motion.div
-                      className="w-24 h-24 rounded-full border-4 border-indigo-600 bg-indigo-100/20 backdrop-blur-sm"
-                      animate={{ scale: [1, 1.02, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    />
-                    <div className="absolute -bottom-6 -right-6 w-8 h-16 bg-gradient-to-b from-indigo-600 to-indigo-800 rounded-full origin-top rotate-45" />
-                  </div>
-                </motion.div>
-                {/* Detail dots */}
-                {[...Array(6)].map((_, i) => (
+                  {/* Glass lens */}
                   <motion.div
-                    key={`detail-${i}`}
-                    className="absolute w-1.5 h-1.5 rounded-full bg-indigo-400"
-                    style={{
-                      left: `${25 + (i % 3) * 25}%`,
-                      top: `${30 + Math.floor(i / 3) * 40}%`,
-                    }}
+                    className="relative"
+                    animate={{ rotate: [0, 5, 0, -5, 0] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    {/* Outer ring */}
+                    <div className="w-36 h-36 rounded-full border-[6px] border-indigo-600 bg-indigo-50/30 backdrop-blur-sm shadow-2xl shadow-indigo-500/20 flex items-center justify-center overflow-hidden">
+                      {/* Magnified content inside lens */}
+                      <div 
+                        className="w-full h-full"
+                        style={{
+                          backgroundImage: `
+                            linear-gradient(rgba(79, 70, 229, 0.3) 2px, transparent 2px),
+                            linear-gradient(90deg, rgba(79, 70, 229, 0.3) 2px, transparent 2px)
+                          `,
+                          backgroundSize: '30px 30px',
+                          transform: 'scale(1.5)',
+                        }}
+                      />
+                      {/* Lens highlight */}
+                      <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/40" />
+                      {/* Focus point in center */}
+                      <motion.div 
+                        className="absolute w-4 h-4 rounded-full bg-indigo-500"
+                        animate={{
+                          scale: [1, 1.3, 1],
+                          opacity: [0.8, 1, 0.8],
+                        }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      />
+                    </div>
+                    
+                    {/* Handle */}
+                    <div className="absolute -bottom-12 -right-8 w-6 h-20 bg-gradient-to-b from-indigo-600 via-indigo-700 to-indigo-800 rounded-full origin-top rotate-45 shadow-lg">
+                      {/* Handle grip lines */}
+                      <div className="absolute top-8 left-1 right-1 space-y-1">
+                        <div className="h-0.5 bg-indigo-500/50 rounded" />
+                        <div className="h-0.5 bg-indigo-500/50 rounded" />
+                        <div className="h-0.5 bg-indigo-500/50 rounded" />
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+
+                {/* Sparkle effects around lens */}
+                {[
+                  { left: "38%", top: "32%", delay: 0 },
+                  { left: "62%", top: "35%", delay: 0.5 },
+                  { left: "35%", top: "58%", delay: 1 },
+                  { left: "65%", top: "55%", delay: 1.5 },
+                ].map((sparkle, i) => (
+                  <motion.div
+                    key={`sparkle-${i}`}
+                    className="absolute"
+                    style={{ left: sparkle.left, top: sparkle.top }}
                     animate={{
-                      opacity: [0.3, 1, 0.3],
+                      opacity: [0, 1, 0],
+                      scale: [0.5, 1, 0.5],
                     }}
                     transition={{
-                      duration: 1.5,
-                      delay: i * 0.2,
+                      duration: 2,
+                      delay: sparkle.delay,
                       repeat: Infinity,
                     }}
-                  />
+                  >
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 text-indigo-400 fill-current">
+                      <path d="M12 0L13.5 9L22 12L13.5 15L12 24L10.5 15L2 12L10.5 9L12 0Z" />
+                    </svg>
+                  </motion.div>
                 ))}
               </div>
               <motion.div
@@ -683,7 +674,10 @@ export default function AboutPage() {
               size="lg"
               className="bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full px-10 text-base font-medium"
             >
-              <Link href="/">
+              <Link 
+                href="/products/watchintosh"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
                 Shop Watchintosh
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

@@ -6,11 +6,11 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   ReactNode,
 } from "react";
 import {
   ShopifyCart,
+  ShopifyCartItem,
   createCheckout,
   fetchCheckout,
   addToCart as shopifyAddToCart,
@@ -34,25 +34,128 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CHECKOUT_ID_KEY = "apfol_checkout_id";
+const LOCAL_CART_KEY = "apfol_local_cart";
+
+// Check if Shopify is configured
+const isShopifyConfigured = () => {
+  return !!(
+    process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN &&
+    process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN
+  );
+};
+
+// Product data for local cart
+const PRODUCT_DATA: Record<string, { title: string; price: string; image: string }> = {
+  "watchintosh": {
+    title: "Watchintosh",
+    price: "39.00",
+    image: "/models/SCENE.glb",
+  },
+  "demo-variant-watchintosh": {
+    title: "Watchintosh",
+    price: "39.00",
+    image: "/models/SCENE.glb",
+  },
+};
+
+// Create an empty local cart
+const createEmptyLocalCart = (): ShopifyCart => ({
+  id: "local-cart",
+  webUrl: "",
+  lineItems: [],
+  subtotalPrice: { amount: "0.00", currencyCode: "USD" },
+  totalPrice: { amount: "0.00", currencyCode: "USD" },
+  lineItemCount: 0,
+  discountAmount: { amount: "0.00", currencyCode: "USD" },
+});
+
+// Calculate "Buy 2 Get 1 Free" discount
+const calculateBuy2Get1FreeDiscount = (lineItems: ShopifyCartItem[]): number => {
+  // Expand all items into individual units with their prices
+  const allUnits: number[] = [];
+  for (const item of lineItems) {
+    const price = parseFloat(item.variant.price.amount);
+    for (let i = 0; i < item.quantity; i++) {
+      allUnits.push(price);
+    }
+  }
+  
+  // Sort by price ascending (cheapest first)
+  allUnits.sort((a, b) => a - b);
+  
+  // For every 3 items, the cheapest one is free
+  // So we get floor(totalItems / 3) free items
+  const freeItemCount = Math.floor(allUnits.length / 3);
+  
+  // Sum up the prices of the cheapest items that are free
+  let discount = 0;
+  for (let i = 0; i < freeItemCount; i++) {
+    discount += allUnits[i];
+  }
+  
+  return discount;
+};
+
+// Calculate cart totals
+const calculateCartTotals = (lineItems: ShopifyCartItem[]): { subtotal: string; total: string; count: number; discount: string } => {
+  let subtotal = 0;
+  let count = 0;
+  
+  for (const item of lineItems) {
+    subtotal += parseFloat(item.variant.price.amount) * item.quantity;
+    count += item.quantity;
+  }
+  
+  const discount = calculateBuy2Get1FreeDiscount(lineItems);
+  const total = subtotal - discount;
+  
+  return {
+    subtotal: subtotal.toFixed(2),
+    total: total.toFixed(2),
+    count,
+    discount: discount.toFixed(2),
+  };
+};
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<ShopifyCart | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const cartInitPromiseRef = useRef<Promise<ShopifyCart | null> | null>(null);
+  const [useLocalCart, setUseLocalCart] = useState(false);
 
-  // Helper to ensure cart is initialized
-  const ensureCart = useCallback(async (): Promise<ShopifyCart | null> => {
-    // If cart already exists, return it
-    if (cart) return cart;
-
-    // If initialization is in progress, wait for it
-    if (cartInitPromiseRef.current) {
-      return cartInitPromiseRef.current;
+  // Load local cart from localStorage
+  const loadLocalCart = useCallback((): ShopifyCart => {
+    if (typeof window === "undefined") return createEmptyLocalCart();
+    
+    const stored = localStorage.getItem(LOCAL_CART_KEY);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return createEmptyLocalCart();
+      }
     }
+    return createEmptyLocalCart();
+  }, []);
 
-    // Start new initialization
-    cartInitPromiseRef.current = (async () => {
+  // Save local cart to localStorage
+  const saveLocalCart = useCallback((cartData: ShopifyCart) => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cartData));
+  }, []);
+
+  // Initialize cart on mount
+  useEffect(() => {
+    const initCart = async () => {
+      // If Shopify is not configured, use local cart
+      if (!isShopifyConfigured()) {
+        setUseLocalCart(true);
+        const localCart = loadLocalCart();
+        setCart(localCart);
+        return;
+      }
+
+      // Try to use Shopify
       try {
         const existingCheckoutId = localStorage.getItem(CHECKOUT_ID_KEY);
 
@@ -60,31 +163,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const existingCart = await fetchCheckout(existingCheckoutId);
           if (existingCart && existingCart.lineItems) {
             setCart(existingCart);
-            return existingCart;
+            return;
           }
         }
 
-        // Create new checkout if none exists or existing one is invalid
+        // Create new checkout
         const newCart = await createCheckout();
         if (newCart) {
           localStorage.setItem(CHECKOUT_ID_KEY, newCart.id);
           setCart(newCart);
-          return newCart;
+          return;
         }
-        return null;
+        
+        // Fallback to local cart if Shopify fails
+        setUseLocalCart(true);
+        setCart(loadLocalCart());
       } catch (error) {
-        console.error("Error initializing cart:", error);
-        return null;
+        console.error("Error initializing Shopify cart, using local cart:", error);
+        setUseLocalCart(true);
+        setCart(loadLocalCart());
       }
-    })();
+    };
 
-    return cartInitPromiseRef.current;
-  }, [cart]);
-
-  // Initialize cart on mount
-  useEffect(() => {
-    ensureCart();
-  }, [ensureCart]);
+    initCart();
+  }, [loadLocalCart]);
 
   const openCart = useCallback(() => setIsCartOpen(true), []);
   const closeCart = useCallback(() => setIsCartOpen(false), []);
@@ -94,19 +196,72 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async (variantId: string, quantity: number = 1) => {
       setIsLoading(true);
       try {
-        // Ensure cart is initialized before adding
-        const currentCart = await ensureCart();
-        if (!currentCart) {
-          console.error("Failed to initialize cart");
-          return;
-        }
+        if (useLocalCart || !isShopifyConfigured()) {
+          // Local cart logic
+          const currentCart = cart || loadLocalCart();
+          const existingItemIndex = currentCart.lineItems.findIndex(
+            (item) => item.variant.id === variantId
+          );
 
-        const updatedCart = await shopifyAddToCart(currentCart.id, variantId, quantity);
-        if (updatedCart) {
+          const productInfo = PRODUCT_DATA[variantId] || {
+            title: "Watchintosh",
+            price: "39.00",
+            image: "",
+          };
+
+          let updatedLineItems: ShopifyCartItem[];
+
+          if (existingItemIndex >= 0) {
+            // Update existing item quantity
+            updatedLineItems = currentCart.lineItems.map((item, index) =>
+              index === existingItemIndex
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            );
+          } else {
+            // Add new item
+            const newItem: ShopifyCartItem = {
+              id: `local-${Date.now()}`,
+              title: productInfo.title,
+              variant: {
+                id: variantId,
+                title: "Default",
+                price: { amount: productInfo.price, currencyCode: "USD" },
+                image: productInfo.image ? { src: productInfo.image, altText: productInfo.title } : null,
+                product: { handle: "watchintosh" },
+              },
+              quantity,
+            };
+            updatedLineItems = [...currentCart.lineItems, newItem];
+          }
+
+          const totals = calculateCartTotals(updatedLineItems);
+          const updatedCart: ShopifyCart = {
+            ...currentCart,
+            lineItems: updatedLineItems,
+            subtotalPrice: { amount: totals.subtotal, currencyCode: "USD" },
+            totalPrice: { amount: totals.total, currencyCode: "USD" },
+            lineItemCount: totals.count,
+            discountAmount: { amount: totals.discount, currencyCode: "USD" },
+          };
+
           setCart(updatedCart);
+          saveLocalCart(updatedCart);
           setIsCartOpen(true);
         } else {
-          console.error("Failed to add item to cart");
+          // Shopify cart logic
+          if (!cart) {
+            console.error("Cart not initialized");
+            return;
+          }
+
+          const updatedCart = await shopifyAddToCart(cart.id, variantId, quantity);
+          if (updatedCart) {
+            setCart(updatedCart);
+            setIsCartOpen(true);
+          } else {
+            console.error("Failed to add item to cart");
+          }
         }
       } catch (error) {
         console.error("Error adding to cart:", error);
@@ -114,26 +269,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-    [ensureCart]
+    [cart, useLocalCart, loadLocalCart, saveLocalCart]
   );
 
   const updateQuantity = useCallback(
     async (lineItemId: string, quantity: number) => {
       setIsLoading(true);
       try {
-        const currentCart = await ensureCart();
-        if (!currentCart) return;
+        if (useLocalCart || !isShopifyConfigured()) {
+          // Local cart logic
+          const currentCart = cart || loadLocalCart();
+          
+          let updatedLineItems: ShopifyCartItem[];
+          if (quantity <= 0) {
+            updatedLineItems = currentCart.lineItems.filter((item) => item.id !== lineItemId);
+          } else {
+            updatedLineItems = currentCart.lineItems.map((item) =>
+              item.id === lineItemId ? { ...item, quantity } : item
+            );
+          }
 
-        if (quantity <= 0) {
-          const updatedCart = await shopifyRemoveFromCart(currentCart.id, lineItemId);
-          if (updatedCart) setCart(updatedCart);
+          const totals = calculateCartTotals(updatedLineItems);
+          const updatedCart: ShopifyCart = {
+            ...currentCart,
+            lineItems: updatedLineItems,
+            subtotalPrice: { amount: totals.subtotal, currencyCode: "USD" },
+            totalPrice: { amount: totals.total, currencyCode: "USD" },
+            lineItemCount: totals.count,
+            discountAmount: { amount: totals.discount, currencyCode: "USD" },
+          };
+
+          setCart(updatedCart);
+          saveLocalCart(updatedCart);
         } else {
-          const updatedCart = await shopifyUpdateCartItem(
-            currentCart.id,
-            lineItemId,
-            quantity
-          );
-          if (updatedCart) setCart(updatedCart);
+          // Shopify cart logic
+          if (!cart) return;
+
+          if (quantity <= 0) {
+            const updatedCart = await shopifyRemoveFromCart(cart.id, lineItemId);
+            if (updatedCart) setCart(updatedCart);
+          } else {
+            const updatedCart = await shopifyUpdateCartItem(cart.id, lineItemId, quantity);
+            if (updatedCart) setCart(updatedCart);
+          }
         }
       } catch (error) {
         console.error("Error updating quantity:", error);
@@ -141,32 +319,56 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-    [ensureCart]
+    [cart, useLocalCart, loadLocalCart, saveLocalCart]
   );
 
   const removeItem = useCallback(
     async (lineItemId: string) => {
       setIsLoading(true);
       try {
-        const currentCart = await ensureCart();
-        if (!currentCart) return;
+        if (useLocalCart || !isShopifyConfigured()) {
+          // Local cart logic
+          const currentCart = cart || loadLocalCart();
+          const updatedLineItems = currentCart.lineItems.filter((item) => item.id !== lineItemId);
 
-        const updatedCart = await shopifyRemoveFromCart(currentCart.id, lineItemId);
-        if (updatedCart) setCart(updatedCart);
+          const totals = calculateCartTotals(updatedLineItems);
+          const updatedCart: ShopifyCart = {
+            ...currentCart,
+            lineItems: updatedLineItems,
+            subtotalPrice: { amount: totals.subtotal, currencyCode: "USD" },
+            totalPrice: { amount: totals.total, currencyCode: "USD" },
+            lineItemCount: totals.count,
+            discountAmount: { amount: totals.discount, currencyCode: "USD" },
+          };
+
+          setCart(updatedCart);
+          saveLocalCart(updatedCart);
+        } else {
+          // Shopify cart logic
+          if (!cart) return;
+          const updatedCart = await shopifyRemoveFromCart(cart.id, lineItemId);
+          if (updatedCart) setCart(updatedCart);
+        }
       } catch (error) {
         console.error("Error removing item:", error);
       } finally {
         setIsLoading(false);
       }
     },
-    [ensureCart]
+    [cart, useLocalCart, loadLocalCart, saveLocalCart]
   );
 
   const checkout = useCallback(() => {
+    if (useLocalCart || !isShopifyConfigured()) {
+      // For local cart, show alert that Shopify needs to be configured
+      alert("Checkout requires Shopify to be configured. Please set up your Shopify credentials.");
+      return;
+    }
+    
     if (cart?.webUrl) {
       window.location.href = cart.webUrl;
     }
-  }, [cart]);
+  }, [cart, useLocalCart]);
 
   return (
     <CartContext.Provider
@@ -195,5 +397,3 @@ export function useCart() {
   }
   return context;
 }
-
-

@@ -10,12 +10,12 @@ import { useCart } from "@/context/cart-context";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "/", label: "Shop Watchintosh" },
-  { href: "/about", label: "About" },
+  { href: "/products/watchintosh", label: "Shop Watchintosh", scrollToTop: true },
+  { href: "/about", label: "About", scrollToTop: false },
 ];
 
 // Pages that use light mode
-const lightModePages = ["/", "/about", "/cart"];
+const lightModePages = ["/", "/about", "/cart", "/products/watchintosh"];
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -80,7 +80,7 @@ export function Navigation() {
                   alt="APFOL"
                   width={32}
                   height={32}
-                  className={`h-8 w-auto -mb-2.5 ${isLight ? "" : "invert"}`}
+                  className={`h-8 w-auto -translate-y-0.5 ${isLight ? "" : "invert"}`}
                   priority
                 />
                 <span className="text-2xl font-semibold tracking-[0.15em] leading-none font-[family-name:var(--font-logo)]">
@@ -105,6 +105,11 @@ export function Navigation() {
                 >
                   <Link
                     href={link.href}
+                    onClick={() => {
+                      if (link.scrollToTop) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
                     className={`text-sm transition-colors ${
                       isLight
                         ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f]"
@@ -193,7 +198,7 @@ export function Navigation() {
                   : "bg-black"
               }`}
             >
-              <div className="flex flex-col h-full p-6">
+              <div className="flex flex-col h-full p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                 {/* Header */}
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -207,7 +212,7 @@ export function Navigation() {
                       alt="APFOL"
                       width={32}
                       height={32}
-                      className={`h-8 w-auto -mb-2.5 ${isLight ? "" : "invert"}`}
+                      className={`h-8 w-auto -translate-y-0.5 ${isLight ? "" : "invert"}`}
                     />
                     <span className="text-2xl font-semibold tracking-[0.15em] leading-none font-[family-name:var(--font-logo)]">
                       APFOL
@@ -241,7 +246,12 @@ export function Navigation() {
                     >
                       <Link
                         href={link.href}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => {
+                          setIsOpen(false);
+                          if (link.scrollToTop) {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
                         className={`block text-4xl font-medium py-3 transition-all ${
                           pathname === link.href
                             ? isLight
@@ -274,9 +284,12 @@ export function Navigation() {
                           ? "bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90"
                           : "bg-white text-black hover:bg-white/90"
                       }`}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setIsOpen(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                     >
-                      <Link href="/">Shop Now</Link>
+                      <Link href="/products/watchintosh">Shop Now</Link>
                     </Button>
                   </motion.div>
                   

@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +17,7 @@ interface Props {
   rotationRange?: number;
   className?: string;
   enableInteraction?: boolean;
+  showHint?: boolean;
 }
 
 export default function ScrollRotate3DModel({
@@ -22,6 +26,7 @@ export default function ScrollRotate3DModel({
   rotationRange = Math.PI * 2,
   className = "",
   enableInteraction = true,
+  showHint = false,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -30,6 +35,7 @@ export default function ScrollRotate3DModel({
   const modelRef = useRef<THREE.Group | null>(null);
   const animationIdRef = useRef<number | null>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Interaction state
   const isDragging = useRef(false);
@@ -42,7 +48,7 @@ export default function ScrollRotate3DModel({
   // Track if user has manually rotated (pauses auto-rotate until scroll)
   const userHasInteracted = useRef(false);
   // Auto-rotation oscillation settings
-  const autoRotateSpeed = 0.003; // Speed of oscillation
+  const autoRotateSpeed = 0.001; // Speed of oscillation (slower for smoother effect)
   const autoRotateMin = -Math.PI / 4; // -45 degrees
   const autoRotateMax = Math.PI / 4;  // +45 degrees
   const autoRotateDirection = useRef(1); // 1 = towards max, -1 = towards min
@@ -119,25 +125,56 @@ export default function ScrollRotate3DModel({
     topLight.position.set(0, 5, 0);
     scene.add(topLight);
 
+    // Setup Draco loader for compressed models
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+    dracoLoader.setDecoderConfig({ type: 'js' });
+    
     // Load the GLB model
     const loader = new GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
     loader.load(
       modelPath,
       (gltf) => {
         const model = gltf.scene;
         
-        // Center the model
+        // Calculate bounding box BEFORE any transforms
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         
-        // Center model at origin
-        model.position.sub(center);
+        console.log("Model original bounds:", {
+          center: { x: center.x, y: center.y, z: center.z },
+          size: { x: size.x, y: size.y, z: size.z },
+          min: { x: box.min.x, y: box.min.y, z: box.min.z },
+          max: { x: box.max.x, y: box.max.y, z: box.max.z }
+        });
         
-        // Scale to fit view
+        // Scale to fit view - target size of ~2 units
         const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2 / maxDim;
+        const targetSize = 2;
+        const scale = targetSize / maxDim;
         model.scale.setScalar(scale);
+        
+        // Recalculate bounding box after scaling
+        const scaledBox = new THREE.Box3().setFromObject(model);
+        const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+        const scaledSize = scaledBox.getSize(new THREE.Vector3());
+        
+        // Center model at origin AFTER scaling
+        model.position.sub(scaledCenter);
+        
+        // Adjust camera distance based on model size
+        const fov = camera.fov * (Math.PI / 180);
+        const cameraDistance = (targetSize / 2) / Math.tan(fov / 2) + targetSize;
+        camera.position.set(0, 0, Math.max(cameraDistance, 4));
+        camera.lookAt(0, 0, 0);
+        
+        console.log("Model after transforms:", {
+          scaledSize: { x: scaledSize.x, y: scaledSize.y, z: scaledSize.z },
+          scale: scale,
+          cameraDistance: cameraDistance
+        });
         
         // Keep original materials but adjust color to white
         model.traverse((child) => {
@@ -176,10 +213,13 @@ export default function ScrollRotate3DModel({
         modelRef.current = group;
         
         console.log("Model loaded successfully:", { 
-          size: size, 
-          scale: scale,
-          maxDim: maxDim 
+          originalMaxDim: maxDim,
+          appliedScale: scale,
+          finalPosition: model.position
         });
+        
+        // Hide loading state
+        setIsLoading(false);
 
         // Setup scroll-based rotation with GSAP
         const scrollTarget = document.querySelector(scrollContainer);
@@ -271,8 +311,8 @@ export default function ScrollRotate3DModel({
       targetRotation.current.y += deltaX * 0.01;
       targetRotation.current.x += deltaY * 0.005;
       
-      // Clamp vertical rotation
-      targetRotation.current.x = Math.max(-0.5, Math.min(0.5, targetRotation.current.x));
+      // Clamp vertical rotation - more restricted for looking under (negative X)
+      targetRotation.current.x = Math.max(-0.15, Math.min(0.4, targetRotation.current.x));
 
       previousMousePosition.current = { x: e.clientX, y: e.clientY };
     };
@@ -298,7 +338,8 @@ export default function ScrollRotate3DModel({
 
       targetRotation.current.y += deltaX * 0.01;
       targetRotation.current.x += deltaY * 0.005;
-      targetRotation.current.x = Math.max(-0.5, Math.min(0.5, targetRotation.current.x));
+      // Clamp vertical rotation - more restricted for looking under (negative X)
+      targetRotation.current.x = Math.max(-0.15, Math.min(0.4, targetRotation.current.x));
 
       previousMousePosition.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     };
@@ -365,15 +406,117 @@ export default function ScrollRotate3DModel({
           }
         });
       }
+      
+      // Dispose Draco loader
+      dracoLoader.dispose();
     };
   }, [modelPath, scrollContainer, rotationRange, handleResize, enableInteraction]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`w-full h-full ${className}`}
-      style={{ touchAction: enableInteraction ? "none" : "auto" }}
-    />
+    <div className={`relative w-full h-full ${className}`}>
+      {/* Loading animation */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, pointerEvents: "none" }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none"
+          >
+            {/* Product image with floating animation */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-48 h-48 md:w-56 md:h-56 mb-6"
+            >
+              {/* Floating animation */}
+              <motion.div
+                animate={{ y: [0, -12, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="w-full h-full relative"
+              >
+                <Image
+                  src="/watchintosh.png"
+                  alt="Watchintosh"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </motion.div>
+              
+              {/* Ambient glow */}
+              <motion.div
+                animate={{
+                  opacity: [0.2, 0.4, 0.2],
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 bg-amber-500/20 blur-3xl rounded-full pointer-events-none"
+              />
+            </motion.div>
+            
+            {/* Big loading text */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-center"
+            >
+              <h3 className="text-xl md:text-2xl font-semibold text-[#1d1d1f]/70 tracking-tight">
+                Loading 3D Model
+              </h3>
+              <div className="flex items-center justify-center gap-1 mt-2">
+                <span className="text-sm text-[#1d1d1f]/40">Interactive experience</span>
+                <span className="flex gap-0.5 ml-1">
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={i}
+                      animate={{ 
+                        opacity: [0.2, 1, 0.2],
+                        y: [0, -2, 0]
+                      }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        delay: i * 0.15,
+                        ease: "easeInOut",
+                      }}
+                      className="w-1 h-1 bg-[#1d1d1f]/40 rounded-full"
+                    />
+                  ))}
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* 3D canvas container */}
+      <div
+        ref={containerRef}
+        className="absolute inset-0 w-full h-full z-0"
+        style={{ touchAction: enableInteraction ? "none" : "auto" }}
+      />
+      
+      {/* Hint text - only show after loading */}
+      {showHint && !isLoading && (
+        <div className="absolute -bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 pointer-events-none">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+            className="text-xs text-[#1d1d1f]/40"
+          >
+            Drag to rotate
+          </motion.span>
+        </div>
+      )}
+    </div>
   );
 }
 
