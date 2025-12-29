@@ -14,7 +14,7 @@ const navLinks = [
 ];
 
 // Pages that use light mode
-const lightModePages = ["/", "/about", "/cart", "/products/watchintosh"];
+const lightModePages = ["/", "/about", "/products/watchintosh"];
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
