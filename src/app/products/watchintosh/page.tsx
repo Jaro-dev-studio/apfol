@@ -283,19 +283,19 @@ const reviews = [
   },
 ];
 
-const UNIT_PRICE = 39;
-const ORIGINAL_PRICE = 59;
+const UNIT_PRICE = 79;
+const ORIGINAL_PRICE = 119;
+const BUNDLE_PRICE = 119; // 2 for $119
 
 export default function WatchintoshProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isBuying, setIsBuying] = useState(false);
 
-  // Buy 2 Get 1 Free pricing logic
+  // 2 for $119 pricing logic
   const calculatePrice = (qty: number) => {
-    // For every 3 items, charge for 2
-    const freeItems = Math.floor(qty / 3);
-    const paidItems = qty - freeItems;
-    return paidItems * UNIT_PRICE;
+    const bundles = Math.floor(qty / 2);
+    const remainder = qty % 2;
+    return bundles * BUNDLE_PRICE + remainder * UNIT_PRICE;
   };
 
   const calculateOriginalPrice = (qty: number) => {
@@ -452,37 +452,43 @@ export default function WatchintoshProductPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-                className="flex items-baseline gap-4 mb-4 sm:mb-8"
+                className="flex flex-col gap-2 mb-4 sm:mb-8"
               >
-                <span className="text-4xl font-semibold text-[#1d1d1f]">
-                  ${currentPrice.toFixed(2)}
-                </span>
-                <span className="text-sm text-[#1d1d1f]/40 line-through">${strikethroughPrice.toFixed(2)}</span>
-                <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Save {savingsPercent}%</span>
+                <div className="flex items-baseline gap-4">
+                  <span className="text-4xl font-semibold text-[#1d1d1f]">
+                    ${currentPrice.toFixed(2)}
+                  </span>
+                  <span className="text-sm text-[#1d1d1f]/40 line-through">${strikethroughPrice.toFixed(2)}</span>
+                  <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Save ${savings} ({savingsPercent}%)</span>
+                </div>
+                <p className="text-sm text-[#1d1d1f]/60">
+                  <span className="text-green-600">&#10003;</span> Free worldwide shipping · <span className="text-green-600">&#10003;</span> 30-day returns
+                </p>
               </motion.div>
 
-              {/* Mobile Buy 2 Get 1 Free Offer - shown only on mobile */}
+              {/* Mobile 2 for $119 - shown only on mobile */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.35 }}
                 className="mb-6 sm:hidden"
               >
-                <div className="flex items-center gap-2 px-3 py-2 rounded-full border transition-all bg-green-50 border-green-200 w-fit">
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">
-                    {quantity >= 3 ? 'Buy 2 Get 1 Free Applied!' : 'Buy 2 Get 1 Free'}
-                  </span>
-                  {quantity < 3 && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-6 text-xs text-green-700 border-green-300 hover:text-green-800 hover:bg-green-100 hover:border-green-400 font-medium ml-1"
-                      onClick={() => setQuantity(3)}
-                    >
-                      Get Offer
-                    </Button>
-                  )}
+                <div className="p-4 rounded-2xl border-2 border-green-400 bg-green-50 w-full">
+                  <div className="mb-2">
+                    <span className="text-xl font-bold text-green-700">2 for $119</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-green-700/80">Save $39 when you buy 2</p>
+                    {quantity < 2 && (
+                      <Button
+                        size="sm"
+                        className="h-8 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-full px-4"
+                        onClick={() => setQuantity(2)}
+                      >
+                        Apply Discount
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </motion.div>
 
@@ -516,20 +522,19 @@ export default function WatchintoshProductPage() {
                     </Button>
                   </div>
                   
-                  {/* Buy 2 Get 1 Free Offer */}
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all bg-green-50 border-green-200">
-                    <Check className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">
-                      {quantity >= 3 ? 'Buy 2 Get 1 Free Applied!' : 'Buy 2 Get 1 Free'}
-                    </span>
-                    {quantity < 3 && (
+                  {/* 2 for $119 */}
+                  <div className="flex items-center gap-3 px-4 py-2 rounded-xl border-2 border-green-400 bg-green-50">
+                    <div className="flex flex-col">
+                      <span className="text-lg font-bold text-green-700">2 for $119</span>
+                      <span className="text-xs text-green-700/70">Save $39 when you buy 2</span>
+                    </div>
+                    {quantity < 2 && (
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="h-7 text-xs text-green-700 border-green-300 hover:text-green-800 hover:bg-green-100 hover:border-green-400 font-medium ml-1"
-                        onClick={() => setQuantity(3)}
+                        className="h-7 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-full px-3 ml-auto"
+                        onClick={() => setQuantity(2)}
                       >
-                        Get Offer
+                        Apply
                       </Button>
                     )}
                   </div>
