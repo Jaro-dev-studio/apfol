@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Menu, X } from "lucide-react";
-import { useCart } from "@/context/cart-context";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -21,10 +20,8 @@ export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { cart, openCart } = useCart();
 
   const isLight = lightModePages.includes(pathname);
-  const itemCount = cart?.lineItemCount || 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -129,31 +126,6 @@ export function Navigation() {
               transition={{ delay: 0.4, duration: 0.5 }}
               className="flex items-center gap-4"
             >
-              <Button
-                variant="ghost"
-                size="icon"
-                className={`relative ${
-                  isLight
-                    ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
-                    : "text-white/80 hover:text-white hover:bg-white/10"
-                }`}
-                onClick={openCart}
-              >
-                <ShoppingBag className="h-5 w-5" />
-                <AnimatePresence>
-                  {itemCount > 0 && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center"
-                    >
-                      {itemCount > 9 ? "9+" : itemCount}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </Button>
-
               {/* Mobile Menu Toggle */}
               <Button
                 variant="ghost"
@@ -293,25 +265,6 @@ export function Navigation() {
                     </Button>
                   </motion.div>
                   
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className={`w-full h-14 rounded-full text-lg font-medium ${
-                        isLight
-                          ? "border-[#1d1d1f]/20 text-[#1d1d1f] hover:bg-[#1d1d1f]/5"
-                          : "border-white/20 text-white hover:bg-white/5"
-                      }`}
-                      onClick={() => {
-                        setIsOpen(false);
-                        openCart();
-                      }}
-                    >
-                      <ShoppingBag className="mr-2 h-5 w-5" />
-                      View Cart {itemCount > 0 && `(${itemCount})`}
-                    </Button>
-                  </motion.div>
-
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

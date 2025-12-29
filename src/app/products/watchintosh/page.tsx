@@ -4,15 +4,15 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import {
-  ShoppingBag,
   Check,
   Star,
   Package,
   Minus,
   Plus,
   Loader2,
+  ArrowRight,
 } from "lucide-react";
-import { useCart } from "@/context/cart-context";
+import { createDirectCheckout, getShopifyCheckoutUrl } from "@/lib/shopify";
 import { motion } from "framer-motion";
 
 const ScrollRotate3DModel = dynamic(
@@ -288,8 +288,7 @@ const ORIGINAL_PRICE = 59;
 
 export default function WatchintoshProductPage() {
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const { addToCart } = useCart();
+  const [isBuying, setIsBuying] = useState(false);
 
   // Buy 2 Get 1 Free pricing logic
   const calculatePrice = (qty: number) => {
@@ -308,12 +307,31 @@ export default function WatchintoshProductPage() {
   const savings = strikethroughPrice - currentPrice;
   const savingsPercent = Math.round((savings / strikethroughPrice) * 100);
 
-  const handleAddToCart = async () => {
-    setIsAddingToCart(true);
+  const handleBuyNow = async () => {
+    setIsBuying(true);
     try {
-      await addToCart(WATCHINTOSH_VARIANT_ID, quantity);
+      // Try to create a direct checkout via Storefront API first
+      const checkoutUrl = await createDirectCheckout(WATCHINTOSH_VARIANT_ID, quantity);
+      
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+      
+      // Fallback to cart permalink format
+      const fallbackUrl = getShopifyCheckoutUrl(WATCHINTOSH_VARIANT_ID, quantity);
+      if (fallbackUrl !== "#") {
+        window.location.href = fallbackUrl;
+        return;
+      }
+      
+      // If Shopify is not configured, show a message
+      alert("Checkout requires Shopify to be configured. Please set up your Shopify credentials.");
+    } catch (error) {
+      console.error("Error creating checkout:", error);
+      alert("There was an error processing your order. Please try again.");
     } finally {
-      setIsAddingToCart(false);
+      setIsBuying(false);
     }
   };
 
@@ -517,19 +535,19 @@ export default function WatchintoshProductPage() {
                   </div>
                 </div>
 
-                {/* Add to cart */}
+                {/* Buy Now */}
                 <Button
                   size="lg"
                   className="w-full bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full px-8 text-base font-medium"
-                  onClick={handleAddToCart}
-                  disabled={isAddingToCart}
+                  onClick={handleBuyNow}
+                  disabled={isBuying}
                 >
-                  {isAddingToCart ? (
+                  {isBuying ? (
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   ) : (
-                    <ShoppingBag className="mr-2 h-5 w-5" />
+                    <ArrowRight className="mr-2 h-5 w-5" />
                   )}
-                  Add to Cart - ${currentPrice.toFixed(2)}
+                  Buy Now - ${currentPrice.toFixed(2)}
                 </Button>
               </motion.div>
             </div>
@@ -907,20 +925,20 @@ export default function WatchintoshProductPage() {
             </motion.div>
           </div>
 
-          {/* Add to cart button */}
+          {/* Buy now button */}
           <motion.div whileTap={{ scale: 0.98 }} className="flex-1">
             <Button
               size="lg"
               className="w-full h-12 bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90 rounded-full text-base font-medium"
-              onClick={handleAddToCart}
-              disabled={isAddingToCart}
+              onClick={handleBuyNow}
+              disabled={isBuying}
             >
-              {isAddingToCart ? (
+              {isBuying ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
-                <ShoppingBag className="mr-2 h-5 w-5" />
+                <ArrowRight className="mr-2 h-5 w-5" />
               )}
-              Add - ${currentPrice.toFixed(2)}
+              Buy Now - ${currentPrice.toFixed(2)}
             </Button>
           </motion.div>
         </div>

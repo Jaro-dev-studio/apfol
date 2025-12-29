@@ -267,4 +267,52 @@ function normalizeCart(checkout: any): ShopifyCart {
   };
 }
 
+// Create a direct checkout with items and return the checkout URL
+export async function createDirectCheckout(
+  variantId: string,
+  quantity: number
+): Promise<string | null> {
+  try {
+    // Check if Shopify is configured
+    if (!process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || 
+        !process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN) {
+      // Return a demo URL for development
+      console.warn("Shopify not configured - using demo checkout");
+      return null;
+    }
+
+    // Create a new checkout with the items
+    const checkout = await client.checkout.create();
+    const lineItemsToAdd = [{ variantId, quantity }];
+    const updatedCheckout = await client.checkout.addLineItems(
+      checkout.id,
+      lineItemsToAdd
+    );
+    
+    return updatedCheckout.webUrl;
+  } catch (error) {
+    console.error("Error creating direct checkout:", error);
+    return null;
+  }
+}
+
+// Get direct checkout URL using Shopify's cart permalink format
+export function getShopifyCheckoutUrl(variantId: string, quantity: number): string {
+  const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+  if (!domain) {
+    return "#";
+  }
+  
+  // Extract numeric ID from the full variant ID if needed
+  // Shopify variant IDs can be in format "gid://shopify/ProductVariant/12345678"
+  let numericId = variantId;
+  if (variantId.includes("/")) {
+    const parts = variantId.split("/");
+    numericId = parts[parts.length - 1];
+  }
+  
+  // Shopify cart permalink format: /cart/{variant_id}:{quantity}
+  return `https://${domain}/cart/${numericId}:${quantity}`;
+}
+
 
