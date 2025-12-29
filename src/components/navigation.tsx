@@ -16,12 +16,20 @@ const navLinks = [
 // Pages that use light mode
 const lightModePages = ["/", "/about", "/products/watchintosh"];
 
+// Pages where navigation should be hidden
+const hideNavPages = ["/products/watchintosh"];
+
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   const isLight = lightModePages.includes(pathname);
+  
+  // Hide navigation on product pages
+  if (hideNavPages.includes(pathname)) {
+    return null;
+  }
 
   useEffect(() => {
     const handleScroll = () => {

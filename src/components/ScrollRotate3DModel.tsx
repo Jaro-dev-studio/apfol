@@ -499,18 +499,18 @@ export default function ScrollRotate3DModel({
       {/* 3D canvas container */}
       <div
         ref={containerRef}
-        className="absolute inset-0 w-full h-full z-0"
+        className="absolute inset-0 w-full h-full z-[5]"
         style={{ touchAction: enableInteraction ? "none" : "auto" }}
       />
       
       {/* Hint text - only show after loading */}
       {showHint && !isLoading && (
-        <div className="absolute -bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 pointer-events-none">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none z-10">
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
-            className="text-xs text-[#1d1d1f]/40"
+            className="text-xs text-[#1d1d1f]/50 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#d4cdc0]/50 whitespace-nowrap"
           >
             Drag to rotate
           </motion.span>

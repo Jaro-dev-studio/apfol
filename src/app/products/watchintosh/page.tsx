@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Check,
@@ -11,9 +12,18 @@ import {
   Plus,
   Loader2,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { createDirectCheckout, getShopifyCheckoutUrl } from "@/lib/shopify";
 import { motion } from "framer-motion";
+
+// Product images - 3D model will be last
+const productImages = [
+  { type: "image" as const, src: "/watchintosh/1.png", alt: "Watchintosh front view", label: "" },
+  { type: "image" as const, src: "/watchintosh/2.png", alt: "Watchintosh angle view", label: "" },
+  { type: "3d" as const, src: "/models/SCENE.glb", alt: "Interactive 3D Demo", label: "3D" },
+];
 
 const ScrollRotate3DModel = dynamic(
   () => import("@/components/ScrollRotate3DModel"),
@@ -290,6 +300,43 @@ const BUNDLE_PRICE = 119; // 2 for $119
 export default function WatchintoshProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isBuying, setIsBuying] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Update active index based on scroll position
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const handleScroll = () => {
+      const scrollLeft = carousel.scrollLeft;
+      const itemWidth = carousel.offsetWidth;
+      const newIndex = Math.round(scrollLeft / itemWidth);
+      setActiveImageIndex(Math.min(newIndex, productImages.length - 1));
+    };
+
+    carousel.addEventListener("scroll", handleScroll);
+    return () => carousel.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToImage = (index: number) => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+    const itemWidth = carousel.offsetWidth;
+    carousel.scrollTo({ left: index * itemWidth, behavior: "smooth" });
+  };
+
+  const scrollPrev = () => {
+    if (activeImageIndex > 0) {
+      scrollToImage(activeImageIndex - 1);
+    }
+  };
+
+  const scrollNext = () => {
+    if (activeImageIndex < productImages.length - 1) {
+      scrollToImage(activeImageIndex + 1);
+    }
+  };
 
   // 2 for $119 pricing logic
   const calculatePrice = (qty: number) => {
@@ -340,7 +387,7 @@ export default function WatchintoshProductPage() {
       {/* Scroll content wrapper for 3D model rotation */}
       <div className="scroll-content pb-24 sm:pb-0">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center px-6 pt-20">
+      <section className="relative min-h-screen flex items-center px-6 pt-8 md:pt-12">
         {/* Background */}
         <div className="parallax-bg absolute inset-0 bg-gradient-to-b from-[#e8dfd0] via-[#f5f0e8] to-[#f5f0e8] pointer-events-none" />
         <div className="absolute inset-0 pointer-events-none opacity-30">
@@ -357,28 +404,119 @@ export default function WatchintoshProductPage() {
 
         <div className="relative z-10 max-w-[1200px] mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Product Image - 3D Model Viewer */}
+            {/* Product Image Carousel */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
               className="order-1"
             >
-              <div className="relative aspect-square max-w-lg mx-auto lg:mx-0">
-                {/* 3D Model Container */}
-                <div className="absolute inset-0 z-10">
-                  <ScrollRotate3DModel
-                    modelPath="/models/SCENE.glb"
-                    scrollContainer=".scroll-content"
-                    rotationRange={Math.PI * 2}
-                    enableInteraction={true}
-                    showHint={true}
-                  />
+              <div className="relative max-w-lg mx-auto lg:mx-0">
+                {/* Main Carousel */}
+                <div className="relative">
+                  {/* Carousel Container */}
+                  <div
+                    ref={carouselRef}
+                    className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide rounded-2xl bg-white/50 border border-[#d4cdc0]/50"
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                  >
+                    {productImages.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex-shrink-0 w-full aspect-square snap-center"
+                      >
+                        {item.type === "image" ? (
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={item.src}
+                              alt={item.alt}
+                              fill
+                              className="object-cover"
+                              priority={index === 0}
+                            />
+                          </div>
+                        ) : (
+                          <div 
+                            className="relative w-full h-full"
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onTouchStart={(e) => e.stopPropagation()}
+                            onTouchMove={(e) => e.stopPropagation()}
+                          >
+                            {/* Title for 3D Demo */}
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                              <span className="text-xs font-medium text-[#1d1d1f]/60 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#d4cdc0]/50">
+                                Interactive 3D Demo
+                              </span>
+                            </div>
+                            <ScrollRotate3DModel
+                              modelPath={item.src}
+                              scrollContainer=".scroll-content"
+                              rotationRange={Math.PI * 2}
+                              enableInteraction={true}
+                              showHint={true}
+                            />
+                            {/* Ambient glow for 3D model */}
+                            <div className="absolute top-1/4 left-1/4 right-1/4 h-1/2 bg-amber-500/10 blur-3xl rounded-full pointer-events-none z-0" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  <button
+                    onClick={scrollPrev}
+                    disabled={activeImageIndex === 0}
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-[#d4cdc0]/50 flex items-center justify-center transition-all ${
+                      activeImageIndex === 0
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100 hover:bg-white hover:scale-105"
+                    }`}
+                  >
+                    <ChevronLeft className="w-5 h-5 text-[#1d1d1f]" />
+                  </button>
+                  <button
+                    onClick={scrollNext}
+                    disabled={activeImageIndex === productImages.length - 1}
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-[#d4cdc0]/50 flex items-center justify-center transition-all ${
+                      activeImageIndex === productImages.length - 1
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100 hover:bg-white hover:scale-105"
+                    }`}
+                  >
+                    <ChevronRight className="w-5 h-5 text-[#1d1d1f]" />
+                  </button>
                 </div>
 
-                {/* Ambient glow */}
-                <div className="absolute top-1/4 left-1/4 right-1/4 h-1/2 bg-amber-500/10 blur-3xl rounded-full pointer-events-none" />
-                <div className="absolute inset-0 bg-amber-500/5 blur-3xl rounded-full pointer-events-none" />
+                {/* Thumbnail Previews */}
+                <div className="flex gap-2 mt-3 justify-center lg:justify-start">
+                  {productImages.map((item, index) => (
+                    <button
+                      key={index}
+                      onClick={() => scrollToImage(index)}
+                      className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                        activeImageIndex === index
+                          ? "border-[#1d1d1f] ring-1 ring-[#1d1d1f]/20"
+                          : "border-[#d4cdc0]/50 hover:border-[#1d1d1f]/50"
+                      }`}
+                    >
+                      {item.type === "image" ? (
+                        <Image
+                          src={item.src}
+                          alt={item.alt}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#e8e0d0] to-[#d4cdc0] flex items-center justify-center">
+                          <div className="text-[10px] font-medium text-[#1d1d1f]/60 text-center leading-tight">
+                            3D
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </motion.div>
 
