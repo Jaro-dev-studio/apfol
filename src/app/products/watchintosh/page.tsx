@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
 import {
   ShoppingBag,
@@ -22,8 +20,6 @@ const ScrollRotate3DModel = dynamic(
   { ssr: false }
 );
 
-gsap.registerPlugin(ScrollTrigger);
-
 // Shopify variant ID for Watchintosh - replace with actual ID from your Shopify store
 const WATCHINTOSH_VARIANT_ID = process.env.NEXT_PUBLIC_WATCHINTOSH_VARIANT_ID || "demo-variant-watchintosh";
 
@@ -32,7 +28,7 @@ const features = [
     id: "precision",
     title: "3D Printed Precision",
     description:
-      "Crafted with high-quality PLA filament for a smooth, durable finish that captures every detail of the original Macintosh design.",
+      "Crafted with ASA, the toughest commercially available organic material, for an ultra-durable finish that captures every detail of the original Macintosh design.",
   },
   {
     id: "fit",
@@ -208,74 +204,81 @@ const FeatureIllustration = ({ id }: { id: string }) => {
 const specs = [
   { label: "Dimensions", value: "55mm x 48mm x 60mm" },
   { label: "Weight", value: "42g" },
-  { label: "Material", value: "Premium PLA" },
+  { label: "Material", value: "Premium ASA" },
   { label: "Finish", value: "Matte textured" },
   { label: "Color", value: "Classic Macintosh Beige" },
   { label: "Compatibility", value: "All Apple Watch models" },
 ];
+
+// Helper function to format date relative to today
+const formatRelativeDate = (daysAgo: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 const reviews = [
   {
     name: "David K.",
     rating: 5,
     text: "As someone who grew up with the original Mac, this brings such joy to my desk. The attention to detail is remarkable.",
-    date: "Dec 20, 2024",
+    daysAgo: 1,
     verified: true,
   },
   {
     name: "Jessica L.",
     rating: 5,
     text: "My coworkers are obsessed with this little stand. It is the perfect conversation starter and actually really functional.",
-    date: "Dec 18, 2024",
+    daysAgo: 3,
     verified: true,
   },
   {
     name: "Thomas B.",
     rating: 5,
     text: "The print quality exceeded my expectations. Fits my Apple Watch Ultra perfectly and looks adorable on my nightstand.",
-    date: "Dec 12, 2024",
+    daysAgo: 5,
     verified: true,
   },
   {
     name: "Sarah M.",
     rating: 5,
     text: "Bought this as a gift for my husband who collects vintage Apple stuff. He absolutely loves it! The quality is outstanding.",
-    date: "Dec 10, 2024",
+    daysAgo: 8,
     verified: true,
   },
   {
     name: "Michael R.",
     rating: 5,
     text: "Such a clever idea and beautifully executed. Makes charging my watch feel special every single time.",
-    date: "Dec 8, 2024",
+    daysAgo: 12,
     verified: true,
   },
   {
     name: "Emily C.",
     rating: 5,
     text: "The perfect blend of nostalgia and functionality. Everyone who sees it on my desk asks where I got it!",
-    date: "Dec 5, 2024",
+    daysAgo: 18,
     verified: true,
   },
   {
     name: "James W.",
     rating: 5,
     text: "Shipping was fast and the packaging was great. The stand itself is even better in person than in photos.",
-    date: "Dec 3, 2024",
+    daysAgo: 25,
     verified: true,
   },
   {
     name: "Amanda P.",
     rating: 5,
     text: "I have the 41mm Watch and it fits perfectly. The nightstand mode looks so cute in the little Mac screen!",
-    date: "Nov 28, 2024",
+    daysAgo: 32,
     verified: true,
   },
   {
     name: "Robert H.",
     rating: 5,
     text: "Incredible attention to detail. You can tell this was made by someone who truly appreciates Apple history.",
-    date: "Nov 25, 2024",
+    daysAgo: 45,
     verified: true,
   },
 ];
@@ -286,7 +289,6 @@ const ORIGINAL_PRICE = 59;
 export default function WatchintoshProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
   const { addToCart } = useCart();
 
   // Buy 2 Get 1 Free pricing logic
@@ -315,55 +317,12 @@ export default function WatchintoshProductPage() {
     }
   };
 
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Parallax background
-      gsap.to(".parallax-bg", {
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-        y: 200,
-      });
-
-      // Floating elements
-      gsap.to(".float-element", {
-        y: -15,
-        duration: 3,
-        ease: "power1.inOut",
-        yoyo: true,
-        repeat: -1,
-      });
-
-      // CRT flicker effect
-      gsap.to(".crt-flicker", {
-        opacity: 0.9,
-        duration: 0.05,
-        ease: "none",
-        yoyo: true,
-        repeat: -1,
-        repeatDelay: 3,
-      });
-      
-      // Refresh ScrollTrigger after animations are set up
-      ScrollTrigger.refresh();
-    });
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <div className="bg-[#f5f0e8] text-[#1d1d1f] overflow-hidden">
       {/* Scroll content wrapper for 3D model rotation */}
       <div className="scroll-content pb-24 sm:pb-0">
       {/* Hero Section */}
-      <section
-        ref={heroRef}
-        className="relative min-h-screen flex items-center px-6 pt-20"
-      >
+      <section className="relative min-h-screen flex items-center px-6 pt-20">
         {/* Background */}
         <div className="parallax-bg absolute inset-0 bg-gradient-to-b from-[#e8dfd0] via-[#f5f0e8] to-[#f5f0e8] pointer-events-none" />
         <div className="absolute inset-0 pointer-events-none opacity-30">
@@ -578,100 +537,6 @@ export default function WatchintoshProductPage() {
         </div>
       </section>
 
-      {/* Product Showcase */}
-      <section className="relative py-32 px-6">
-        <div className="max-w-[1200px] mx-auto text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-[#1d1d1f]"
-          >
-            Hello Again.
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 80 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-            className="text-xl md:text-2xl text-[#1d1d1f]/60 max-w-3xl mx-auto mb-16"
-          >
-            A tribute to the computer that started it all. The Watchintosh
-            transforms your Apple Watch into a tiny piece of computing history.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-            className="relative max-w-sm mx-auto"
-          >
-            {/* Showcase Macintosh */}
-            <div className="relative aspect-[4/5]">
-              {/* Shadow */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-4 bg-black/10 blur-xl rounded-full" />
-
-              {/* Mac illustration */}
-              <div className="relative w-full h-full">
-                <div className="absolute inset-4 bg-gradient-to-b from-[#f0e8d8] to-[#e0d8c8] rounded-2xl border border-[#d0c8b8] shadow-xl">
-                  {/* Screen area */}
-                  <div className="absolute top-6 left-4 right-4 h-[60%] bg-[#c8c0b0] rounded-lg p-2">
-                    <div className="w-full h-full bg-[#0a0a0a] rounded overflow-hidden relative">
-                      {/* Simulated happy mac icon */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-[#33ff33] opacity-80">
-                          <svg
-                            viewBox="0 0 48 48"
-                            className="w-16 h-16"
-                            fill="currentColor"
-                          >
-                            <rect
-                              x="8"
-                              y="4"
-                              width="32"
-                              height="36"
-                              rx="2"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            />
-                            <rect x="12" y="8" width="24" height="18" rx="1" />
-                            <circle cx="18" cy="14" r="2" fill="#0a0a0a" />
-                            <circle cx="30" cy="14" r="2" fill="#0a0a0a" />
-                            <path
-                              d="M18 20 Q24 24 30 20"
-                              fill="none"
-                              stroke="#0a0a0a"
-                              strokeWidth="2"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      {/* Scan lines */}
-                      <div
-                        className="absolute inset-0 opacity-10"
-                        style={{
-                          backgroundImage:
-                            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {/* Logo text */}
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[#a8a090] text-xs font-medium tracking-wider">
-                    Watchintosh
-                  </div>
-                  {/* Drive slot */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-1 bg-[#b8b0a0] rounded-full" />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Features Grid */}
       <section className="relative py-32 px-6 overflow-hidden">
         {/* Background decorations */}
@@ -769,7 +634,7 @@ export default function WatchintoshProductPage() {
               Simple Setup
             </h2>
             <p className="text-lg text-[#1d1d1f]/60 max-w-2xl mx-auto">
-              Get your mini Macintosh up and running in seconds.
+              Get your Watchintosh up and running in seconds.
             </p>
           </div>
 
@@ -900,13 +765,7 @@ export default function WatchintoshProductPage() {
         <div className="absolute bottom-20 left-0 w-72 h-72 bg-amber-100/30 rounded-full blur-3xl" />
         
         <div className="relative max-w-[1400px] mx-auto">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center mb-16"
-          >
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-[#1d1d1f]">
               Loved by Apple Fans
             </h2>
@@ -948,16 +807,12 @@ export default function WatchintoshProductPage() {
             <p className="text-[#1d1d1f]/60 max-w-xl mx-auto">
               Join thousands of Apple enthusiasts who have brought a piece of computing history to their desks.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {reviews.map((review, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: (index % 3) * 0.1 }}
                 className="group p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-[#d4cdc0]/50 hover:border-amber-200/50 hover:shadow-lg hover:shadow-amber-900/5 transition-all duration-300"
               >
                 {/* Header with stars and verified badge */}
@@ -994,25 +849,19 @@ export default function WatchintoshProductPage() {
                     </span>
                   </div>
                   <span className="text-xs text-[#1d1d1f]/40">
-                    {review.date}
+                    {formatRelativeDate(review.daysAgo)}
                   </span>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
           
           {/* See all reviews link */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            className="text-center mt-12"
-          >
+          <div className="text-center mt-12">
             <p className="text-[#1d1d1f]/60 text-sm">
               Showing 9 of 2,847+ reviews
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
