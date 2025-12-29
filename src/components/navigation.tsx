@@ -25,11 +25,7 @@ export function Navigation() {
   const pathname = usePathname();
 
   const isLight = lightModePages.includes(pathname);
-  
-  // Hide navigation on product pages
-  if (hideNavPages.includes(pathname)) {
-    return null;
-  }
+  const isHidden = hideNavPages.includes(pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,6 +47,11 @@ export function Navigation() {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
+
+  // Hide navigation on product pages (after all hooks)
+  if (isHidden) {
+    return null;
+  }
 
   return (
     <>

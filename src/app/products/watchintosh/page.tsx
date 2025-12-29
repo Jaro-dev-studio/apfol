@@ -33,182 +33,827 @@ const ScrollRotate3DModel = dynamic(
 // Shopify variant ID for Watchintosh - replace with actual ID from your Shopify store
 const WATCHINTOSH_VARIANT_ID = process.env.NEXT_PUBLIC_WATCHINTOSH_VARIANT_ID || "demo-variant-watchintosh";
 
-const features = [
-  {
-    id: "precision",
-    title: "3D Printed Precision",
-    description:
-      "Crafted with ASA, the toughest commercially available organic material, for an ultra-durable finish that captures every detail of the original Macintosh design.",
-  },
-  {
-    id: "fit",
-    title: "Universal Watch Fit",
-    description:
-      "Designed to accommodate all Apple Watch sizes from 38mm to 49mm, including the Ultra series.",
-  },
-  {
-    id: "retro",
-    title: "Authentic Retro Aesthetic",
-    description:
-      "Faithfully recreated in classic Macintosh beige, bringing 1984 nostalgia to your modern desk setup.",
-  },
-  {
-    id: "angle",
-    title: "Perfect Viewing Angle",
-    description:
-      "Ergonomically tilted display area positions your Apple Watch at the ideal angle for nightstand mode.",
-  },
+// Pre-generated star positions for the AngleFeature (avoiding Math.random during render)
+const starPositions = [
+  { top: 12, left: 8, duration: 2.3, delay: 0.1 },
+  { top: 45, left: 92, duration: 3.1, delay: 1.2 },
+  { top: 78, left: 23, duration: 2.7, delay: 0.5 },
+  { top: 5, left: 67, duration: 3.5, delay: 1.8 },
+  { top: 89, left: 45, duration: 2.1, delay: 0.3 },
+  { top: 34, left: 78, duration: 2.9, delay: 1.5 },
+  { top: 67, left: 12, duration: 3.3, delay: 0.8 },
+  { top: 23, left: 56, duration: 2.5, delay: 1.1 },
+  { top: 56, left: 34, duration: 3.0, delay: 0.6 },
+  { top: 91, left: 89, duration: 2.2, delay: 1.9 },
+  { top: 8, left: 45, duration: 2.8, delay: 0.4 },
+  { top: 72, left: 67, duration: 3.2, delay: 1.3 },
+  { top: 38, left: 5, duration: 2.4, delay: 0.9 },
+  { top: 15, left: 82, duration: 3.4, delay: 1.6 },
+  { top: 82, left: 56, duration: 2.6, delay: 0.2 },
+  { top: 48, left: 19, duration: 3.0, delay: 1.0 },
+  { top: 28, left: 38, duration: 2.3, delay: 1.7 },
+  { top: 95, left: 72, duration: 2.9, delay: 0.7 },
+  { top: 62, left: 85, duration: 3.1, delay: 1.4 },
+  { top: 18, left: 28, duration: 2.7, delay: 0.0 },
+  { top: 75, left: 95, duration: 2.5, delay: 1.2 },
+  { top: 42, left: 48, duration: 3.3, delay: 0.5 },
+  { top: 3, left: 15, duration: 2.1, delay: 1.8 },
+  { top: 88, left: 32, duration: 2.8, delay: 0.3 },
+  { top: 52, left: 75, duration: 3.0, delay: 1.5 },
+  { top: 25, left: 62, duration: 2.4, delay: 0.8 },
+  { top: 68, left: 42, duration: 3.2, delay: 1.1 },
+  { top: 35, left: 88, duration: 2.6, delay: 0.6 },
+  { top: 85, left: 18, duration: 2.9, delay: 1.9 },
+  { top: 58, left: 52, duration: 3.4, delay: 0.4 },
 ];
 
-// Feature illustrations as components
-const FeatureIllustration = ({ id }: { id: string }) => {
-  switch (id) {
-    case "precision":
+// Feature Section Components - Each with unique immersive animations
+
+// 1. 3D Printed Precision - Layer Build Animation
+const PrecisionFeature = () => {
+  const layers = 12;
+  
       return (
-        <div className="relative w-full h-full flex items-center justify-center">
-          {/* 3D printing layers animation */}
-          <div className="relative w-24 h-28">
-            {[...Array(8)].map((_, i) => (
+    <div className="relative min-h-[70vh] flex items-center overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1d1d1f] via-[#2a2a2c] to-[#1d1d1f]" />
+      
+      {/* Animated grid pattern */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 0.1 }}
+        viewport={{ once: true }}
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '30px 30px'
+        }}
+      />
+      
+      <div className="relative z-10 max-w-[1400px] mx-auto w-full px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Animation Side */}
+          <div className="relative h-[400px] flex items-center justify-center order-2 lg:order-1">
+            {/* Ambient glow */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="w-64 h-64 rounded-full bg-amber-500/20 blur-3xl"
+              />
+            </div>
+            
+            {/* 3D Print Build Animation */}
+            <div className="relative w-48 h-64">
+              {/* Base plate */}
+              <motion.div
+                initial={{ opacity: 0, scaleX: 0 }}
+                whileInView={{ opacity: 1, scaleX: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 h-2 bg-gradient-to-r from-[#444] via-[#666] to-[#444] rounded-sm"
+              />
+              
+              {/* Printing layers - Mac shape */}
+              {[...Array(layers)].map((_, i) => {
+                const isScreenArea = i >= 2 && i <= 7;
+                const layerWidth = isScreenArea ? 85 : (70 + Math.sin(i * 0.4) * 15);
+                
+                return (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: -20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scaleX: 0, x: '-50%' }}
+                    whileInView={{ opacity: 1, scaleX: 1, x: '-50%' }}
                 viewport={{ once: true }}
                 transition={{ 
-                  delay: i * 0.1,
-                  duration: 0.4,
+                      delay: 0.3 + i * 0.12,
+                      duration: 0.5,
                   ease: [0.22, 1, 0.36, 1]
                 }}
-                className="absolute left-0 right-0"
-                style={{ bottom: `${i * 12}px` }}
+                    className="absolute left-1/2"
+                    style={{ bottom: `${8 + i * 16}px` }}
               >
-                <div 
-                  className="h-3 rounded-sm mx-auto"
+                    <motion.div 
+                      className="h-4 rounded-sm relative overflow-hidden"
                   style={{ 
-                    width: `${60 + Math.sin(i * 0.8) * 20}%`,
-                    background: `linear-gradient(90deg, #d4cdc0 0%, #e8e0d0 50%, #d4cdc0 100%)`,
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                  }}
+                        width: `${layerWidth * 2}px`,
+                        background: isScreenArea 
+                          ? 'linear-gradient(90deg, #d4cdc0 0%, #c5beb0 20%, #1a1a1a 25%, #1a1a1a 75%, #c5beb0 80%, #d4cdc0 100%)'
+                          : 'linear-gradient(90deg, #c5beb0 0%, #e8e0d0 50%, #c5beb0 100%)',
+                      }}
+                    >
+                      {/* Printing shimmer effect */}
+                      <motion.div
+                        initial={{ x: '-100%' }}
+                        animate={{ x: '200%' }}
+                        transition={{ 
+                          delay: 0.3 + i * 0.12,
+                          duration: 0.8,
+                          ease: 'linear'
+                        }}
+                        className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                 />
               </motion.div>
-            ))}
-            {/* Nozzle */}
+                  </motion.div>
+                );
+              })}
+              
+              {/* Nozzle assembly */}
             <motion.div
-              initial={{ y: -30 }}
-              whileInView={{ y: 0 }}
+                initial={{ y: -100, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.8, duration: 0.5 }}
-              className="absolute -top-4 left-1/2 -translate-x-1/2"
+                transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute -top-8 left-1/2 -translate-x-1/2"
             >
-              <div className="w-4 h-6 bg-gradient-to-b from-[#666] to-[#444] rounded-b-full" />
+                {/* Gantry */}
+                <div className="w-72 h-1 bg-gradient-to-r from-transparent via-[#555] to-transparent mb-1" />
+                {/* Nozzle */}
               <motion.div
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-1 h-2 bg-amber-400 mx-auto rounded-full"
-              />
+                  animate={{ x: [-60, 60, -60] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="relative"
+                >
+                  <div className="w-8 h-6 bg-gradient-to-b from-[#666] to-[#333] mx-auto rounded-b-lg relative">
+                    {/* Heat block */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-3 bg-gradient-to-b from-[#ff6b35] to-[#e55a2b]" />
+                    {/* Filament drop */}
+                    <motion.div
+                      animate={{ 
+                        height: [0, 8, 0],
+                        opacity: [0, 1, 0]
+                      }}
+                      transition={{ duration: 0.5, repeat: Infinity }}
+                      className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 bg-amber-400 rounded-full"
+                    />
+                  </div>
             </motion.div>
-          </div>
-        </div>
-      );
-    case "fit":
-      return (
-        <div className="relative w-full h-full flex items-center justify-center gap-3">
-          {/* Different watch sizes */}
-          {[38, 42, 45, 49].map((size, i) => (
-            <motion.div
-              key={size}
-              initial={{ opacity: 0, scale: 0 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ 
-                delay: i * 0.15,
-                duration: 0.5,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-              className="flex flex-col items-center"
-            >
-              <div 
-                className="rounded-lg bg-gradient-to-b from-[#1d1d1f] to-[#333] flex items-center justify-center"
-                style={{ 
-                  width: `${20 + i * 6}px`, 
-                  height: `${24 + i * 7}px`,
-                  borderRadius: size === 49 ? '6px' : '8px'
-                }}
-              >
+              </motion.div>
+              
+              {/* Floating particles */}
+              {[...Array(8)].map((_, i) => (
                 <motion.div
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-                  className="w-1.5 h-1.5 rounded-full bg-green-400"
+                  key={`particle-${i}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ 
+                    opacity: [0, 0.6, 0],
+                    y: [0, -100],
+                    x: [0, (i % 2 === 0 ? 1 : -1) * (20 + i * 5)]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: i * 0.4,
+                    ease: 'easeOut'
+                  }}
+                  className="absolute bottom-20 left-1/2 w-1 h-1 bg-amber-300 rounded-full"
                 />
-              </div>
-              <span className="text-[10px] text-[#1d1d1f]/40 mt-1">{size}mm</span>
-            </motion.div>
-          ))}
-        </div>
-      );
-    case "retro":
-      return (
-        <div className="relative w-full h-full flex items-center justify-center">
-          {/* Retro color palette with pixel aesthetic */}
-          <div className="grid grid-cols-6 gap-1">
-            {[
-              '#f5f0e8', '#e8dfd0', '#d4cdc0', '#c5beb0', '#b0a898', '#968f80',
-              '#f0e8d8', '#e0d8c8', '#d0c8b8', '#c0b8a8', '#a89888', '#887868',
-              '#33ff33', '#00cc00', '#009900', '#006600', '#003300', '#001a00',
-            ].map((color, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  delay: i * 0.03,
-                  duration: 0.3,
-                }}
-                whileHover={{ scale: 1.2 }}
-                className="w-5 h-5 rounded-sm cursor-pointer transition-transform"
-                style={{ backgroundColor: color, boxShadow: 'inset 0 -1px 2px rgba(0,0,0,0.1)' }}
-              />
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      );
-    case "angle":
-      return (
-        <div className="relative w-full h-full flex items-center justify-center">
-          {/* Angle visualization */}
-          <div className="relative">
-            {/* Base/desk line */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-[#d4cdc0]" />
-            
-            {/* Mini Macintosh */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
+          
+          {/* Text Side */}
+          <div className="order-1 lg:order-2">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-16 h-20"
+              className="inline-block text-amber-400 text-sm font-medium tracking-widest uppercase mb-4"
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-[#e8e0d0] to-[#d4cdc0] rounded-lg border border-[#c5beb0]">
-                <div className="absolute top-2 left-1.5 right-1.5 h-10 bg-[#1a1a1a] rounded-sm">
-                  <div className="absolute inset-0.5 bg-[#0a1a0a] rounded-sm flex items-center justify-center">
+              Premium Materials
+            </motion.span>
+            <motion.h3
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-6"
+            >
+              3D Printed
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-400">
+                Precision
+              </span>
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-lg md:text-xl text-white/60 leading-relaxed max-w-lg"
+            >
+              Crafted with ASA, the toughest commercially available organic material, 
+              for an ultra-durable finish that captures every detail of the original 
+              Macintosh design.
+            </motion.p>
+            
+            {/* Specs badges */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="flex flex-wrap gap-3 mt-8"
+            >
+              {['0.2mm Layer Height', 'ASA Material', 'UV Resistant'].map((spec, i) => (
+                <span key={i} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 text-sm">
+                  {spec}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+          </div>
+        </div>
+      );
+};
+
+// 2. Universal Watch Fit - Orbital Constellation
+const FitFeature = () => {
+  const watches = [
+    { size: 38, label: '38mm', delay: 0, angle: 0 },
+    { size: 41, label: '41mm', delay: 0.15, angle: 90 },
+    { size: 45, label: '45mm', delay: 0.3, angle: 180 },
+    { size: 49, label: 'Ultra', delay: 0.45, angle: 270 },
+  ];
+  
+      return (
+    <div className="relative min-h-[70vh] flex items-center overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f5f0e8] via-[#ebe4d8] to-[#e8e0d0]" />
+      
+      {/* Radial pattern */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-30">
+        {[...Array(6)].map((_, i) => (
+            <motion.div
+            key={i}
+            initial={{ scale: 0, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 0.3 - i * 0.04 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1, duration: 1 }}
+            className="absolute rounded-full border border-[#1d1d1f]/10"
+            style={{ width: `${200 + i * 100}px`, height: `${200 + i * 100}px` }}
+          />
+        ))}
+      </div>
+      
+      <div className="relative z-10 max-w-[1400px] mx-auto w-full px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Text Side */}
+          <div>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-block text-amber-600 text-sm font-medium tracking-widest uppercase mb-4"
+            >
+              Universal Compatibility
+            </motion.span>
+            <motion.h3
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="text-4xl md:text-5xl lg:text-6xl font-semibold text-[#1d1d1f] mb-6"
+            >
+              Fits Every
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600">
+                Apple Watch
+              </span>
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-lg md:text-xl text-[#1d1d1f]/60 leading-relaxed max-w-lg"
+            >
+              Designed to accommodate all Apple Watch sizes from 38mm to 49mm, 
+              including the Ultra series. One Watchintosh, every watch.
+            </motion.p>
+            
+            {/* Size list */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="flex flex-wrap gap-4 mt-8"
+            >
+              {['Series 1-9', 'SE', 'Ultra 1 & 2'].map((model, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4 + i * 0.1, type: 'spring', stiffness: 200 }}
+                    className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center"
+                  >
+                    <Check className="w-4 h-4 text-white" />
+                  </motion.div>
+                  <span className="text-[#1d1d1f]/80 font-medium">{model}</span>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+          
+          {/* Animation Side - Orbital */}
+          <div className="relative h-[400px] flex items-center justify-center">
+            {/* Central Watchintosh */}
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 100 }}
+              className="relative z-20"
+            >
+              <div className="w-24 h-28 bg-gradient-to-b from-[#e8e0d0] to-[#d4cdc0] rounded-xl border-2 border-[#c5beb0] shadow-2xl">
+                <div className="absolute top-3 left-2 right-2 h-14 bg-[#1a1a1a] rounded-md">
+                  <div className="absolute inset-1 bg-[#0a1a0a] rounded-sm flex items-center justify-center">
                     <motion.div
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="text-[#33ff33] text-[8px]"
+                      className="text-[#33ff33] text-xs font-mono"
                     >
-                      12:00
+                      FITS ALL
                     </motion.div>
                   </div>
                 </div>
               </div>
             </motion.div>
+            
+            {/* Orbiting watches */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+              className="absolute w-80 h-80"
+            >
+              {watches.map((watch, i) => (
+                <motion.div
+                  key={watch.size}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+                  transition={{ delay: watch.delay + 0.5, type: 'spring', stiffness: 150 }}
+                  className="absolute"
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    transform: `rotate(${watch.angle}deg) translateX(140px) rotate(-${watch.angle}deg)`,
+                    marginTop: `-${(24 + i * 5)}px`,
+                    marginLeft: `-${(20 + i * 4)}px`,
+                  }}
+                >
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                    className="relative group"
+            >
+              <div 
+                      className="bg-gradient-to-b from-[#1d1d1f] to-[#333] rounded-xl flex items-center justify-center shadow-xl border border-[#444] relative overflow-hidden"
+                style={{ 
+                        width: `${40 + i * 8}px`, 
+                        height: `${48 + i * 10}px`,
+                }}
+              >
+                      {/* Watch face glow */}
+                <motion.div
+                        animate={{ opacity: [0.4, 0.8, 0.4] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
+                        className="w-3 h-3 rounded-full bg-green-400 shadow-lg shadow-green-400/50"
+                />
+              </div>
+                    <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-medium text-[#1d1d1f]/60 whitespace-nowrap">
+                      {watch.label}
+                    </span>
+                  </motion.div>
+            </motion.div>
+          ))}
+            </motion.div>
+            
+            {/* Orbit path */}
+            <div className="absolute w-80 h-80 rounded-full border-2 border-dashed border-[#d4cdc0] opacity-50" />
+          </div>
+        </div>
+      </div>
+        </div>
+      );
+};
+
+// 3. Authentic Retro Aesthetic - CRT Boot Sequence
+const RetroFeature = () => {
+      return (
+    <div className="relative min-h-[70vh] flex items-center overflow-hidden">
+      {/* Dark background with CRT ambiance */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a]" />
+      
+      {/* Scan lines overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-10"
+        style={{
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)'
+        }}
+      />
+      
+      <div className="relative z-10 max-w-[1400px] mx-auto w-full px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* CRT Animation Side */}
+          <div className="relative h-[400px] flex items-center justify-center order-2 lg:order-1">
+            {/* CRT Monitor */}
+              <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="relative"
+            >
+              {/* Monitor body */}
+              <div className="w-72 h-56 bg-gradient-to-b from-[#e8e0d0] to-[#c5beb0] rounded-2xl p-4 shadow-2xl border border-[#b0a898]">
+                {/* Screen bezel */}
+                <div className="w-full h-full bg-[#1a1a1a] rounded-lg p-3 relative overflow-hidden">
+                  {/* CRT screen with curvature effect */}
+                  <div 
+                    className="w-full h-full rounded-md relative overflow-hidden"
+                    style={{
+                      background: 'radial-gradient(ellipse at center, #0a2a0a 0%, #041004 100%)',
+                      boxShadow: 'inset 0 0 60px rgba(0,0,0,0.5)'
+                    }}
+                  >
+                    {/* Screen flicker */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.5 }}
+                      className="absolute inset-0"
+                    >
+                      {/* Boot sequence */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.8, duration: 0.3 }}
+                        className="flex flex-col items-center justify-center h-full"
+                      >
+                        {/* Happy Mac icon */}
+                        <motion.div
+                          initial={{ scale: 0, y: 20 }}
+                          whileInView={{ scale: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 1, type: 'spring', stiffness: 200 }}
+                          className="relative"
+                        >
+                          <div className="w-16 h-20 bg-[#33ff33] rounded-lg flex flex-col items-center justify-center">
+                            {/* Mac face */}
+                            <div className="flex gap-2 mb-1">
+                              <div className="w-2 h-2 bg-[#0a2a0a] rounded-sm" />
+                              <div className="w-2 h-2 bg-[#0a2a0a] rounded-sm" />
+                            </div>
+                            {/* Smile */}
+                            <div className="w-6 h-3 border-b-2 border-[#0a2a0a] rounded-b-full" />
+                          </div>
+                        </motion.div>
+                        
+                        {/* Boot text */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 1.3 }}
+                          className="mt-4 text-[#33ff33] text-xs font-mono"
+                        >
+                          <motion.span
+                            animate={{ opacity: [1, 0, 1] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                          >
+                            Welcome to Macintosh_
+                          </motion.span>
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
+                    
+                    {/* Screen glare */}
+                    <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)'
+                      }}
+                    />
+                    
+                    {/* Phosphor glow */}
+                    <motion.div
+                      animate={{ opacity: [0.3, 0.5, 0.3] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                      className="absolute inset-0 rounded-md"
+                      style={{
+                        boxShadow: 'inset 0 0 30px rgba(51,255,51,0.2)'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Monitor stand */}
+              <div className="w-20 h-4 bg-gradient-to-b from-[#d4cdc0] to-[#c5beb0] mx-auto -mt-1 rounded-b-lg" />
+              <div className="w-32 h-2 bg-gradient-to-b from-[#c5beb0] to-[#b0a898] mx-auto rounded-b-lg" />
+              
+              {/* Ambient glow */}
+              <motion.div
+                animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute top-10 left-10 right-10 bottom-20 bg-[#33ff33] blur-3xl rounded-lg -z-10"
+              />
+            </motion.div>
+          </div>
+          
+          {/* Text Side */}
+          <div className="order-1 lg:order-2">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-block text-[#33ff33] text-sm font-medium tracking-widest uppercase mb-4"
+            >
+              Classic Design
+            </motion.span>
+            <motion.h3
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-6"
+            >
+              Authentic
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#33ff33] to-[#00cc00]">
+                Retro Aesthetic
+              </span>
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-lg md:text-xl text-white/60 leading-relaxed max-w-lg"
+            >
+              Faithfully recreated in classic Macintosh beige, bringing 1984 nostalgia 
+              to your modern desk setup. A piece of computing history, reimagined.
+            </motion.p>
+            
+            {/* Color swatches */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="flex items-center gap-4 mt-8"
+            >
+              <span className="text-white/40 text-sm">Authentic Colors:</span>
+              <div className="flex gap-2">
+                {['#e8e0d0', '#d4cdc0', '#c5beb0', '#33ff33'].map((color, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4 + i * 0.1, type: 'spring', stiffness: 200 }}
+                    className="w-8 h-8 rounded-full border-2 border-white/20"
+                    style={{ backgroundColor: color }}
+              />
+            ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
           </div>
         </div>
       );
-    default:
-      return null;
-  }
+};
+
+// 4. Perfect Viewing Angle - Spotlight Stage
+const AngleFeature = () => {
+      return (
+    <div className="relative min-h-[70vh] flex items-center overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f0f23]" />
+      
+      {/* Stars */}
+      {starPositions.map((star, i) => (
+            <motion.div
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0.2, 0.8, 0.2] }}
+          transition={{ 
+            duration: star.duration,
+            repeat: Infinity,
+            delay: star.delay
+          }}
+          className="absolute w-1 h-1 bg-white rounded-full"
+          style={{
+            top: `${star.top}%`,
+            left: `${star.left}%`,
+          }}
+        />
+      ))}
+      
+      <div className="relative z-10 max-w-[1400px] mx-auto w-full px-6 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Text Side */}
+          <div>
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-block text-blue-400 text-sm font-medium tracking-widest uppercase mb-4"
+            >
+              Ergonomic Design
+            </motion.span>
+            <motion.h3
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white mb-6"
+            >
+              Perfect
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                Viewing Angle
+              </span>
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-lg md:text-xl text-white/60 leading-relaxed max-w-lg"
+            >
+              Ergonomically tilted display area positions your Apple Watch at the ideal 
+              angle for nightstand mode. Wake up to the time at a glance.
+            </motion.p>
+            
+            {/* Angle indicator */}
+                    <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="flex items-center gap-6 mt-8"
+            >
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
+                <svg viewBox="0 0 24 24" className="w-6 h-6 text-blue-400">
+                  <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                <span className="text-white/80 font-medium">Optimal Visibility</span>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
+                <span className="text-2xl font-bold text-blue-400">15°</span>
+                <span className="text-white/60 text-sm">Tilt Angle</span>
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Animation Side - Spotlight Stage */}
+          <div className="relative h-[400px] flex items-center justify-center">
+            {/* Spotlight cone */}
+            <motion.div
+              initial={{ opacity: 0, scaleY: 0 }}
+              whileInView={{ opacity: 1, scaleY: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="absolute top-0 left-1/2 -translate-x-1/2 origin-top"
+              style={{
+                width: '200px',
+                height: '300px',
+                background: 'linear-gradient(180deg, rgba(59,130,246,0.3) 0%, rgba(59,130,246,0) 100%)',
+                clipPath: 'polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%)',
+              }}
+            />
+            
+            {/* Stage platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="relative"
+            >
+              {/* Rotating platform */}
+              <motion.div
+                animate={{ rotateY: [0, 10, -10, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
+                className="relative"
+              >
+                {/* Watchintosh on platform */}
+                <motion.div
+                  initial={{ rotateX: 0 }}
+                  animate={{ rotateX: [-5, 5, -5] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="relative"
+                  style={{ transform: 'rotateX(15deg)' }}
+                >
+                  <div className="w-28 h-36 bg-gradient-to-b from-[#e8e0d0] to-[#c5beb0] rounded-xl border-2 border-[#b0a898] shadow-2xl relative">
+                    {/* Screen area */}
+                    <div className="absolute top-3 left-2 right-2 h-16 bg-[#1a1a1a] rounded-md overflow-hidden">
+                      <div className="absolute inset-1 bg-gradient-to-b from-[#0a1a0a] to-[#041004] rounded-sm flex items-center justify-center">
+                        {/* Clock display */}
+                        <motion.div
+                          animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                          className="text-center"
+                    >
+                          <div className="text-[#33ff33] text-2xl font-mono font-bold">12:00</div>
+                          <div className="text-[#33ff33]/60 text-xs">MON 29</div>
+                    </motion.div>
+                  </div>
+                </div>
+                    
+                    {/* Floppy drive */}
+                    <div className="absolute bottom-3 left-2 right-2 h-4 bg-[#1a1a1a] rounded-sm" />
+              </div>
+                  
+                  {/* Angle arc indicator */}
+                  <motion.svg
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.8 }}
+                    className="absolute -right-16 top-1/2 -translate-y-1/2 w-16 h-16"
+                    viewBox="0 0 60 60"
+                  >
+                    <motion.path
+                      initial={{ pathLength: 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 1, duration: 0.8 }}
+                      d="M 10 50 A 40 40 0 0 1 50 50"
+                      fill="none"
+                      stroke="#3b82f6"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <text x="30" y="35" textAnchor="middle" fill="#3b82f6" fontSize="10" fontWeight="bold">15°</text>
+                  </motion.svg>
+                </motion.div>
+              </motion.div>
+              
+              {/* Platform base */}
+              <div className="w-40 h-4 bg-gradient-to-r from-[#333] via-[#555] to-[#333] mx-auto mt-4 rounded-full" 
+                   style={{ transform: 'perspective(500px) rotateX(60deg)' }} />
+              
+              {/* Light rays */}
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scaleY: 0 }}
+                  whileInView={{ opacity: 0.3, scaleY: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.6 + i * 0.1, duration: 0.5 }}
+                  className="absolute bottom-0 origin-bottom"
+                  style={{
+                    left: `${30 + i * 10}%`,
+                    width: '2px',
+                    height: '60px',
+                    background: 'linear-gradient(to top, rgba(59,130,246,0.5), transparent)',
+                    transform: `rotate(${(i - 2) * 15}deg)`,
+                  }}
+                />
+              ))}
+            </motion.div>
+            
+            {/* Eye icon tracking */}
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.7, duration: 0.6 }}
+              className="absolute right-8 top-1/3"
+            >
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <svg viewBox="0 0 24 24" className="w-12 h-12 text-blue-400/60">
+                  <path fill="currentColor" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+                {/* Tracking line */}
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: '60px' }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 1, duration: 0.5 }}
+                  className="h-0.5 bg-gradient-to-r from-blue-400/60 to-transparent absolute left-1/2 top-1/2 -translate-x-full"
+                  style={{ marginLeft: '-30px' }}
+                />
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+          </div>
+        </div>
+      );
 };
 
 const specs = [
@@ -698,20 +1343,19 @@ export default function WatchintoshProductPage() {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="relative py-32 px-6 overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#f5f0e8] via-[#eee8dc] to-[#f5f0e8]" />
+      {/* Features - Immersive Sections */}
+      <section className="relative">
+        {/* Section Header */}
+        <div className="relative py-24 px-6 bg-gradient-to-b from-[#f5f0e8] via-[#eee8dc] to-[#f5f0e8]">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-100/30 rounded-full blur-3xl" />
         
-        <div className="relative max-w-[1200px] mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center mb-20"
+            className="relative text-center max-w-[1200px] mx-auto"
           >
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
@@ -730,61 +1374,19 @@ export default function WatchintoshProductPage() {
               authentic vintage feel.
             </p>
           </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.id}
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: index * 0.1 }}
-                className="group relative"
-              >
-                <div className="relative h-full rounded-[2rem] bg-white/80 backdrop-blur-sm border border-[#d4cdc0]/50 overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/5 hover:border-amber-200/50">
-                  {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-50/0 to-amber-100/0 group-hover:from-amber-50/50 group-hover:to-amber-100/30 transition-all duration-500" />
-                  
-                  {/* Illustration area */}
-                  <div className="relative h-40 md:h-48 border-b border-[#e8e0d0] bg-gradient-to-b from-[#faf8f4] to-white/50 overflow-hidden">
-                    {/* Decorative grid */}
-                    <div 
-                      className="absolute inset-0 opacity-30"
-                      style={{
-                        backgroundImage: 'radial-gradient(circle at 1px 1px, #d4cdc0 1px, transparent 1px)',
-                        backgroundSize: '24px 24px'
-                      }}
-                    />
-                    <FeatureIllustration id={feature.id} />
-                  </div>
-                  
-                  {/* Content area */}
-                  <div className="relative p-6 md:p-8">
-                    <div className="flex items-start gap-4">
-                      <motion.div
-                        whileHover={{ rotate: 5, scale: 1.05 }}
-                        className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20"
-                      >
-                        <span className="text-white font-bold text-lg">{index + 1}</span>
-                      </motion.div>
-                      <div className="flex-1">
-                        <h3 className="text-xl md:text-2xl font-semibold mb-2 text-[#1d1d1f] group-hover:text-amber-900 transition-colors">
-                          {feature.title}
-                        </h3>
-                        <p className="text-[#1d1d1f]/60 leading-relaxed">
-                          {feature.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Corner accent */}
-                  <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
+        
+        {/* Feature 1: 3D Printed Precision */}
+        <PrecisionFeature />
+        
+        {/* Feature 2: Universal Watch Fit */}
+        <FitFeature />
+        
+        {/* Feature 3: Authentic Retro Aesthetic */}
+        <RetroFeature />
+        
+        {/* Feature 4: Perfect Viewing Angle */}
+        <AngleFeature />
       </section>
 
       {/* Specifications */}
