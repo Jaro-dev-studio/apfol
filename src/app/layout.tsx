@@ -24,6 +24,15 @@ export const metadata: Metadata = {
   description: "The Watchintosh is a beautifully crafted Apple Watch stand inspired by the iconic Macintosh 128K. Transform your Apple Watch into a tiny retro computer on your desk.",
   keywords: ["Watchintosh", "Apple Watch stand", "Macintosh stand", "retro Apple Watch dock", "vintage Mac stand", "Apple Watch charging stand", "3D printed Apple Watch stand"],
   authors: [{ name: "APFOL" }],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
     title: "Watchintosh - Retro Mac Apple Watch Stand",
     description: "Transform your Apple Watch into a tiny Macintosh. A nostalgic charging stand for the modern age.",
