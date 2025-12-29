@@ -49,12 +49,12 @@ const PRODUCT_DATA: Record<string, { title: string; price: string; image: string
   "watchintosh": {
     title: "Watchintosh",
     price: "39.00",
-    image: "/models/SCENE.glb",
+    image: "/watchintosh.png",
   },
   "demo-variant-watchintosh": {
     title: "Watchintosh",
     price: "39.00",
-    image: "/models/SCENE.glb",
+    image: "/watchintosh.png",
   },
 };
 

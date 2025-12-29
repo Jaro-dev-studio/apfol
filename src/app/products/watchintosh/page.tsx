@@ -175,38 +175,13 @@ const FeatureIllustration = ({ id }: { id: string }) => {
             {/* Base/desk line */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-[#d4cdc0]" />
             
-            {/* Angle arc */}
-            <motion.svg
-              width="80"
-              height="60"
-              viewBox="0 0 80 60"
-              className="absolute bottom-0 left-1/2 -translate-x-1/2"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-            >
-              <motion.path
-                d="M 40 55 L 40 55 A 30 30 0 0 1 58 20"
-                stroke="#f59e0b"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray="50"
-                initial={{ strokeDashoffset: 50 }}
-                whileInView={{ strokeDashoffset: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-              />
-            </motion.svg>
-            
             {/* Mini Macintosh */}
             <motion.div
-              initial={{ rotate: 0, opacity: 0 }}
-              whileInView={{ rotate: -15, opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-16 h-20 origin-bottom"
-              style={{ transformOrigin: 'bottom center' }}
+              className="relative w-16 h-20"
             >
               <div className="absolute inset-0 bg-gradient-to-b from-[#e8e0d0] to-[#d4cdc0] rounded-lg border border-[#c5beb0]">
                 <div className="absolute top-2 left-1.5 right-1.5 h-10 bg-[#1a1a1a] rounded-sm">
@@ -221,17 +196,6 @@ const FeatureIllustration = ({ id }: { id: string }) => {
                   </div>
                 </div>
               </div>
-            </motion.div>
-            
-            {/* Angle label */}
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.8 }}
-              className="absolute -right-8 top-4 text-amber-600 font-medium text-sm"
-            >
-              15
             </motion.div>
           </div>
         </div>
@@ -892,8 +856,6 @@ export default function WatchintoshProductPage() {
                 </h4>
                 <ul className="text-[#1d1d1f]/60 space-y-1">
                   <li>1x Watchintosh Stand</li>
-                  <li>1x Setup Guide</li>
-                  <li>1x Microfiber Cleaning Cloth</li>
                 </ul>
                 <p className="text-sm text-[#1d1d1f]/40 mt-3 italic">
                   Note: Apple Watch charger not included. Uses your existing
