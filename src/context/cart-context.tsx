@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
   ReactNode,
 } from "react";
 import {
@@ -38,30 +39,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<ShopifyCart | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const cartInitPromiseRef = useRef<Promise<ShopifyCart | null> | null>(null);
+
+  // Helper to ensure cart is initialized
+  const ensureCart = useCallback(async (): Promise<ShopifyCart | null> => {
+    // If cart already exists, return it
+    if (cart) return cart;
+
+    // If initialization is in progress, wait for it
+    if (cartInitPromiseRef.current) {
+      return cartInitPromiseRef.current;
+    }
+
+    // Start new initialization
+    cartInitPromiseRef.current = (async () => {
+      try {
+        const existingCheckoutId = localStorage.getItem(CHECKOUT_ID_KEY);
+
+        if (existingCheckoutId) {
+          const existingCart = await fetchCheckout(existingCheckoutId);
+          if (existingCart && existingCart.lineItems) {
+            setCart(existingCart);
+            return existingCart;
+          }
+        }
+
+        // Create new checkout if none exists or existing one is invalid
+        const newCart = await createCheckout();
+        if (newCart) {
+          localStorage.setItem(CHECKOUT_ID_KEY, newCart.id);
+          setCart(newCart);
+          return newCart;
+        }
+        return null;
+      } catch (error) {
+        console.error("Error initializing cart:", error);
+        return null;
+      }
+    })();
+
+    return cartInitPromiseRef.current;
+  }, [cart]);
 
   // Initialize cart on mount
   useEffect(() => {
-    const initializeCart = async () => {
-      const existingCheckoutId = localStorage.getItem(CHECKOUT_ID_KEY);
-
-      if (existingCheckoutId) {
-        const existingCart = await fetchCheckout(existingCheckoutId);
-        if (existingCart && existingCart.lineItems) {
-          setCart(existingCart);
-          return;
-        }
-      }
-
-      // Create new checkout if none exists or existing one is invalid
-      const newCart = await createCheckout();
-      if (newCart) {
-        localStorage.setItem(CHECKOUT_ID_KEY, newCart.id);
-        setCart(newCart);
-      }
-    };
-
-    initializeCart();
-  }, []);
+    ensureCart();
+  }, [ensureCart]);
 
   const openCart = useCallback(() => setIsCartOpen(true), []);
   const closeCart = useCallback(() => setIsCartOpen(false), []);
@@ -69,59 +92,74 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = useCallback(
     async (variantId: string, quantity: number = 1) => {
-      if (!cart) return;
-
       setIsLoading(true);
       try {
-        const updatedCart = await shopifyAddToCart(cart.id, variantId, quantity);
+        // Ensure cart is initialized before adding
+        const currentCart = await ensureCart();
+        if (!currentCart) {
+          console.error("Failed to initialize cart");
+          return;
+        }
+
+        const updatedCart = await shopifyAddToCart(currentCart.id, variantId, quantity);
         if (updatedCart) {
           setCart(updatedCart);
           setIsCartOpen(true);
+        } else {
+          console.error("Failed to add item to cart");
         }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
       } finally {
         setIsLoading(false);
       }
     },
-    [cart]
+    [ensureCart]
   );
 
   const updateQuantity = useCallback(
     async (lineItemId: string, quantity: number) => {
-      if (!cart) return;
-
       setIsLoading(true);
       try {
+        const currentCart = await ensureCart();
+        if (!currentCart) return;
+
         if (quantity <= 0) {
-          const updatedCart = await shopifyRemoveFromCart(cart.id, lineItemId);
+          const updatedCart = await shopifyRemoveFromCart(currentCart.id, lineItemId);
           if (updatedCart) setCart(updatedCart);
         } else {
           const updatedCart = await shopifyUpdateCartItem(
-            cart.id,
+            currentCart.id,
             lineItemId,
             quantity
           );
           if (updatedCart) setCart(updatedCart);
         }
+      } catch (error) {
+        console.error("Error updating quantity:", error);
       } finally {
         setIsLoading(false);
       }
     },
-    [cart]
+    [ensureCart]
   );
 
   const removeItem = useCallback(
     async (lineItemId: string) => {
-      if (!cart) return;
-
       setIsLoading(true);
       try {
-        const updatedCart = await shopifyRemoveFromCart(cart.id, lineItemId);
+        const currentCart = await ensureCart();
+        if (!currentCart) return;
+
+        const updatedCart = await shopifyRemoveFromCart(currentCart.id, lineItemId);
         if (updatedCart) setCart(updatedCart);
+      } catch (error) {
+        console.error("Error removing item:", error);
       } finally {
         setIsLoading(false);
       }
     },
-    [cart]
+    [ensureCart]
   );
 
   const checkout = useCallback(() => {

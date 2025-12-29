@@ -3,21 +3,19 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingBag, X } from "lucide-react";
+import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/context/cart-context";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products/watchtrainer", label: "WatchTrainer" },
-  { href: "/products/watchintosh", label: "Watchintosh" },
-  { href: "/#products", label: "Products" },
+  { href: "/", label: "Shop Watchintosh" },
   { href: "/about", label: "About" },
 ];
 
 // Pages that use light mode
-const lightModePages = ["/products/watchintosh"];
+const lightModePages = ["/", "/about", "/cart"];
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,141 +35,256 @@ export function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? isLight
-            ? "glass border-b border-[#d4cdc0]"
-            : "glass-dark border-b border-white/10"
-          : "bg-transparent"
-      }`}
-    >
-      <nav className="mx-auto max-w-[1200px] px-6 lg:px-8">
-        <div className="flex h-12 items-center justify-between">
-          {/* Logo */}
-          <Link
-            href="/"
-            className={`text-xl font-semibold tracking-tight transition-opacity hover:opacity-80 ${
-              isLight ? "text-[#1d1d1f]" : "text-white"
-            }`}
-          >
-            apfol
-          </Link>
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+  return (
+    <>
+      <motion.header
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+          isScrolled
+            ? isLight
+              ? "bg-[#f5f0e8] border-b border-[#d4cdc0]"
+              : "bg-black border-b border-white/10"
+            : "bg-transparent"
+        }`}
+      >
+        <nav className="mx-auto max-w-[1200px] px-6 py-4">
+          <div className="flex h-10 items-center justify-between">
+            {/* Logo */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm transition-colors ${
-                  isLight
-                    ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f]"
-                    : "text-white/80 hover:text-white"
+                href="/"
+                className={`flex items-end gap-2 transition-opacity hover:opacity-80 ${
+                  isLight ? "text-[#1d1d1f]" : "text-white"
                 }`}
               >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`relative ${
-                isLight
-                  ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
-                  : "text-white/80 hover:text-white hover:bg-white/10"
-              }`}
-              onClick={openCart}
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center">
-                  {itemCount > 9 ? "9+" : itemCount}
+                <Image
+                  src="/logo.png"
+                  alt="APFOL"
+                  width={32}
+                  height={32}
+                  className={`h-8 w-auto -mb-2.5 ${isLight ? "" : "invert"}`}
+                  priority
+                />
+                <span className="text-2xl font-semibold tracking-[0.15em] leading-none font-[family-name:var(--font-logo)]">
+                  APFOL
                 </span>
-              )}
-            </Button>
+              </Link>
+            </motion.div>
 
-            {/* Mobile Menu */}
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild className="md:hidden">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={
-                    isLight
-                      ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                  }
+            {/* Desktop Navigation */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="hidden md:flex items-center gap-8"
+            >
+              {navLinks.map((link, index) => (
+                <motion.div
+                  key={link.href}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.1, duration: 0.4 }}
                 >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side="right"
-                className={
+                  <Link
+                    href={link.href}
+                    className={`text-sm transition-colors ${
+                      isLight
+                        ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f]"
+                        : "text-white/80 hover:text-white"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Actions */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="flex items-center gap-4"
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`relative ${
                   isLight
-                    ? "w-full bg-[#f5f0e8] border-l border-[#d4cdc0]"
-                    : "w-full bg-black border-l border-white/10"
-                }
+                    ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
+                }`}
+                onClick={openCart}
               >
-                <div className="flex flex-col h-full">
-                  <div className="flex justify-between items-center mb-8">
-                    <span
-                      className={`text-xl font-semibold ${
-                        isLight ? "text-[#1d1d1f]" : "text-white"
-                      }`}
+                <ShoppingBag className="h-5 w-5" />
+                <AnimatePresence>
+                  {itemCount > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center"
                     >
-                      apfol
+                      {itemCount > 9 ? "9+" : itemCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Button>
+
+              {/* Mobile Menu Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`md:hidden ${
+                  isLight
+                    ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
+                }`}
+                onClick={() => setIsOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </motion.div>
+          </div>
+        </nav>
+      </motion.header>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm md:hidden"
+              onClick={() => setIsOpen(false)}
+            />
+
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className={`fixed inset-y-0 left-0 right-0 z-50 md:hidden ${
+                isLight
+                  ? "bg-[#f5f0e8]"
+                  : "bg-black"
+              }`}
+            >
+              <div className="flex flex-col h-full p-6">
+                {/* Header */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                  className="flex justify-between items-center mb-12"
+                >
+                  <div className={`flex items-end gap-2 ${isLight ? "text-[#1d1d1f]" : "text-white"}`}>
+                    <Image
+                      src="/logo.png"
+                      alt="APFOL"
+                      width={32}
+                      height={32}
+                      className={`h-8 w-auto -mb-2.5 ${isLight ? "" : "invert"}`}
+                    />
+                    <span className="text-2xl font-semibold tracking-[0.15em] leading-none font-[family-name:var(--font-logo)]">
+                      APFOL
                     </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setIsOpen(false)}
-                      className={
-                        isLight
-                          ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
-                          : "text-white/80 hover:text-white hover:bg-white/10"
-                      }
-                    >
-                      <X className="h-5 w-5" />
-                    </Button>
                   </div>
-                  <div className="flex flex-col gap-4">
-                    {navLinks.map((link) => (
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsOpen(false)}
+                    className={`p-2 rounded-full transition-colors ${
+                      isLight
+                        ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f] hover:bg-[#1d1d1f]/10"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <X className="h-6 w-6" />
+                  </motion.button>
+                </motion.div>
+
+                {/* Navigation Links */}
+                <div className="flex flex-col gap-2">
+                  {navLinks.map((link, index) => (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{
+                        delay: 0.15 + index * 0.08,
+                        duration: 0.3,
+                      }}
+                    >
                       <Link
-                        key={link.href}
                         href={link.href}
                         onClick={() => setIsOpen(false)}
-                        className={`text-2xl font-medium transition-colors py-2 ${
-                          isLight
-                            ? "text-[#1d1d1f]/70 hover:text-[#1d1d1f]"
-                            : "text-white/80 hover:text-white"
+                        className={`block text-4xl font-medium py-3 transition-all ${
+                          pathname === link.href
+                            ? isLight
+                              ? "text-[#1d1d1f]"
+                              : "text-white"
+                            : isLight
+                              ? "text-[#1d1d1f]/50 hover:text-[#1d1d1f] hover:translate-x-2"
+                              : "text-white/50 hover:text-white hover:translate-x-2"
                         }`}
                       >
                         {link.label}
                       </Link>
-                    ))}
-                  </div>
-                  <div className="mt-auto space-y-3">
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Bottom Actions */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.35, duration: 0.3 }}
+                  className="mt-auto space-y-4"
+                >
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       asChild
-                      className={`w-full rounded-full ${
+                      size="lg"
+                      className={`w-full h-14 rounded-full text-lg font-medium ${
                         isLight
                           ? "bg-[#1d1d1f] text-white hover:bg-[#1d1d1f]/90"
                           : "bg-white text-black hover:bg-white/90"
                       }`}
                       onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/#products">Shop Now</Link>
+                      <Link href="/">Shop Now</Link>
                     </Button>
+                  </motion.div>
+                  
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       variant="outline"
-                      className={`w-full rounded-full ${
+                      size="lg"
+                      className={`w-full h-14 rounded-full text-lg font-medium ${
                         isLight
                           ? "border-[#1d1d1f]/20 text-[#1d1d1f] hover:bg-[#1d1d1f]/5"
                           : "border-white/20 text-white hover:bg-white/5"
@@ -181,16 +294,27 @@ export function Navigation() {
                         openCart();
                       }}
                     >
-                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      <ShoppingBag className="mr-2 h-5 w-5" />
                       View Cart {itemCount > 0 && `(${itemCount})`}
                     </Button>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </nav>
-    </header>
+                  </motion.div>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.45, duration: 0.3 }}
+                    className={`text-center text-sm pt-4 ${
+                      isLight ? "text-[#1d1d1f]/40" : "text-white/40"
+                    }`}
+                  >
+                    Free shipping worldwide
+                  </motion.p>
+                </motion.div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

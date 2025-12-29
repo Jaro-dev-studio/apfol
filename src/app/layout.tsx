@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -12,16 +12,23 @@ const inter = Inter({
   display: "swap",
 });
 
+const outfit = Outfit({
+  variable: "--font-logo",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Apfol - Premium Apple Accessories",
-  description: "Discover stunning custom gadgets designed exclusively for Apple users. Premium quality meets innovative design.",
-  keywords: ["Apple accessories", "Apple Watch charger", "Pokeball charger", "WatchTrainer", "premium gadgets"],
-  authors: [{ name: "Apfol" }],
+  title: "Watchintosh - Retro Mac Apple Watch Stand | APFOL",
+  description: "The Watchintosh is a beautifully crafted Apple Watch stand inspired by the iconic Macintosh 128K. Transform your Apple Watch into a tiny retro computer on your desk.",
+  keywords: ["Watchintosh", "Apple Watch stand", "Macintosh stand", "retro Apple Watch dock", "vintage Mac stand", "Apple Watch charging stand", "3D printed Apple Watch stand"],
+  authors: [{ name: "APFOL" }],
   openGraph: {
-    title: "Apfol - Premium Apple Accessories",
-    description: "Discover stunning custom gadgets designed exclusively for Apple users.",
+    title: "Watchintosh - Retro Mac Apple Watch Stand",
+    description: "Transform your Apple Watch into a tiny Macintosh. A nostalgic charging stand for the modern age.",
     url: "https://apfol.com",
-    siteName: "Apfol",
+    siteName: "APFOL",
     type: "website",
   },
 };
@@ -32,8 +39,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en">
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
         <CartProvider>
           <Navigation />
           <main>{children}</main>

@@ -121,9 +121,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior: none;
   }
   html {
     scroll-behavior: smooth;
+    overscroll-behavior: none;
   }
 }
 
@@ -144,7 +146,7 @@
   }
 
   .glass {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(245, 240, 232, 0.85);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
@@ -155,17 +157,26 @@
     -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
 
-  .pokeball-gradient {
-    background: linear-gradient(180deg, #ff1c1c 0%, #ff1c1c 45%, #1a1a1a 45%, #1a1a1a 55%, #fff 55%, #fff 100%);
+  .mac-beige-gradient {
+    background: linear-gradient(180deg, #e8e0d0 0%, #d4cdc0 100%);
   }
 
   .hero-glow {
-    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 28, 28, 0.3), transparent);
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(217, 180, 120, 0.3), transparent);
+  }
+
+  .crt-screen {
+    background: #0a1a0a;
+    box-shadow: inset 0 0 20px rgba(51, 255, 51, 0.1);
   }
 
   .section-fade {
     opacity: 0;
     transform: translateY(60px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 

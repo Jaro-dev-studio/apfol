@@ -93,16 +93,16 @@ export async function fetchProductByHandle(
       images: product.images.map((img) => ({
         id: img.id as string,
         src: img.src,
-        altText: img.altText,
+        altText: img.altText ?? null,
       })),
       variants: product.variants.map((v) => ({
         id: v.id as string,
         title: v.title,
         price: {
-          amount: v.price.amount,
+          amount: String(v.price.amount),
           currencyCode: v.price.currencyCode,
         },
-        available: v.available,
+        available: (v as unknown as { available: boolean }).available,
       })),
     };
   } catch (error) {
@@ -123,16 +123,16 @@ export async function fetchAllProducts(): Promise<ShopifyProduct[]> {
       images: product.images.map((img) => ({
         id: img.id as string,
         src: img.src,
-        altText: img.altText,
+        altText: img.altText ?? null,
       })),
       variants: product.variants.map((v) => ({
         id: v.id as string,
         title: v.title,
         price: {
-          amount: v.price.amount,
+          amount: String(v.price.amount),
           currencyCode: v.price.currencyCode,
         },
-        available: v.available,
+        available: (v as unknown as { available: boolean }).available,
       })),
     }));
   } catch (error) {
